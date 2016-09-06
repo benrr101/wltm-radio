@@ -1,2 +1,0 @@
-class History < ApplicationRecord
-end

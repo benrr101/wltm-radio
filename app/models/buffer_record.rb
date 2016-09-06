@@ -1,0 +1,2 @@
+class BufferRecord < ApplicationRecord
+end
