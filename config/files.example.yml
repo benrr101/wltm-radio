@@ -1,0 +1,29 @@
+############################################################################
+# Custom configuration for finding files in WLTM Radio
+
+development:
+  # All paths used will be append to this path
+  base_path: /mnt/space/
+
+  # Files in these folders will be used for shuffling
+  # Paths that include * will be passed through Dir.glob
+  included_folders:
+    - '**/wltmradio/'
+    - 'another/path/here'
+
+  # Only files with these extensions will be available to be queued
+  allowed_extensions:
+    - flac
+    - wav
+    - mp3
+    - ogg
+    - aac
+    - aiff
+    - mpa
+    - m4a
+    - wma
+    - ape
+
+production:
+  <<: *development
+

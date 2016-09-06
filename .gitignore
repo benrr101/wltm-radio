@@ -35,6 +35,7 @@ bower.json
 Gemfile.lock
 
 # Ignore sensitive files
+/config/files.yml
 /config/database.yml
 /config/secrets.yml
 /config/initializers/secret_token.rb
