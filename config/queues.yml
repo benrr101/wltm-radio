@@ -1,0 +1,15 @@
+############################################################################
+# Custom configuration for buffering and queueing mechanisms in WLTM Radio
+
+default: &default
+  # Maximum number of tracks to have queued in the buffer
+  buffer_max_tracks: 10
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default

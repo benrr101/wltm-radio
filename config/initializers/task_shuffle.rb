@@ -10,15 +10,25 @@ Rails.application.config.after_initialize do
   # Create the rufus scheduler singleton
   s = Rufus::Scheduler.singleton
 
-
   # Setup the task to run every 10s
   s.every '10s' do
     # If there are less than 10 files in the buffer, add a new one to to the buffer
-    if true # TODO: Hook this up with MySQL
-      Rails.logger.info('Hello from the shuffle scheduler')
-      shuffle_files = FileSystem.get_all_shuffle_files()
-      shuffle_files = shuffle_files.shuffle()
-      Rails.logger.info(shuffle_files[0])
+    buffer_count = BufferRecord.count
+    if buffer_count < Rails.configuration.queues['buffer_max_tracks']
+      # Get all the eligible files, shuffle, and pick one
+      shuffle_files = FileSystem.get_all_shuffle_files
+      shuffle_files = shuffle_files.shuffle
+      shuffle_pick = shuffle_files[0]
+
+      # Add it to the buffer
+      Rails.logger.info("Adding 1 track to buffer: '#{shuffle_pick}'")
+      BufferRecord.create(
+          absolute_path: shuffle_pick,
+          on_behalf_of: 'shuffle_bot',
+          bot_queued: true
+      )
+    else
+      Rails.logger.info("Buffer contains #{buffer_count} tracks, no more will be added")
     end
   end
 end

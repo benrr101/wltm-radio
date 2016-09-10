@@ -14,5 +14,8 @@ module WLTMRadioApi2
 
     # Load up the file config
     Rails.configuration.files = config_for(:files)
+
+    # Load up the queue config
+    Rails.configuration.queues = config_for(:queues)
   end
 end
