@@ -21,6 +21,7 @@ Rails.application.config.after_initialize do
       shuffle_pick = shuffle_files[0]
 
       # Add it to the buffer
+      # TODO: Top off buffer instead of adding one
       Rails.logger.info("Adding 1 track to buffer: '#{shuffle_pick}'")
       BufferRecord.create(
           absolute_path: shuffle_pick,
