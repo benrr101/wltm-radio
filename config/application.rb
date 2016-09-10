@@ -13,6 +13,6 @@ module WLTMRadioApi2
     # -- all .rb files in that directory are automatically loaded.
 
     # Load up the file config
-    config.files = config_for(:files)
+    Rails.configuration.files = config_for(:files)
   end
 end

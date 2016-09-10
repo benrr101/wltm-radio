@@ -1,7 +1,7 @@
 ############################################################################
 # Custom configuration for finding files in WLTM Radio
 
-development:
+default: &default
   # All paths used will be append to this path
   base_path: /mnt/space/
 
@@ -24,6 +24,12 @@ development:
     - wma
     - ape
 
+development:
+  <<: *default
+
+test:
+  <<: *default
+
 production:
-  <<: *development
+  <<: *default
 
