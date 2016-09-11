@@ -10,22 +10,32 @@ Rails.application.config.after_initialize do
   s = Rufus::Scheduler.singleton
 
   # Setup the task to run every 5 seconds
-  s.every '5s' do
+  s.every '5s', overlap: false do
     # If there is less than one track in the queue or if the remaining time is less than
     # 10 seconds, add another one from the buffer
     mpd = Mpd.new
     remaining_time = mpd.remaining_time
-    if remaining_time.nil? || remaining_time <= 10
+    if remaining_time.nil? || (remaining_time <= 10 && mpd.queue_length < 2)
       # Pop the top of the buffer
       buffer_file = BufferRecord.first
+      if buffer_file.nil?
+        Rails.logger.error('Buffer is empty! Cannot add to mpd queue! Consider increasing size of buffer to prevent mpd starvation')
+        next
+      end
       buffer_file.destroy
 
       # Add it to MPD's queue
-      Rails.logger.info('Adding track from buffer')
-      Mpd.queue_add(buffer_file.absolute_path)
+      begin
+        Rails.logger.info('Adding track from buffer')
+        file_uri = "file:///#{buffer_file.absolute_path}"
+        mpd.queue_add(file_uri)
+      rescue Exception => e
+        Rails.logger.error("Failed to add '#{file_uri}' to MPD: #{e.message}")
+        next
+      end
 
       # Add a history record of the track that was added
-      HistoryRecord.Create(
+      HistoryRecord.create(
          absolute_path: buffer_file.absolute_path,
          display_name: File.basename(buffer_file.absolute_path),
          on_behalf_of: buffer_file.on_behalf_of,
@@ -33,7 +43,7 @@ Rails.application.config.after_initialize do
          played_time: DateTime.now + 10.seconds
       )
     else
-      Rails.logger.info("Current track has #{remaining_time}s left, no tracks need adding")
+      Rails.logger.info("Current track has #{remaining_time}s left and #{mpd.queue_length} track in queue, no tracks will be added to queue")
     end
   end
 end

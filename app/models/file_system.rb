@@ -7,7 +7,7 @@ class FileSystem
     Rails.configuration.files['included_folders'].each do |folder|
       folder = File.join(Rails.configuration.files['base_path'], folder)
       Rails.configuration.files['allowed_extensions'].each do |allowed_extension|
-        glob = File.join(folder, '*.' + allowed_extension)
+        glob = File.join(folder, '**/*.' + allowed_extension)
         globbings.push(glob)
       end
     end

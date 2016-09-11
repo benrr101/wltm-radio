@@ -19,7 +19,10 @@ class Mpd
     @mpd_connection.connect
     begin
       # Add a new track to the queue
-      @mpd_connection.queue.add(abs_path)
+      @mpd_connection.add(abs_path)
+
+      # If we're not already playing, we need to start playback
+      @mpd_connection.play unless @mpd_connection.playing?
     ensure
       # Make sure we always disconnect
       @mpd_connection.disconnect
@@ -45,7 +48,7 @@ class Mpd
     @mpd_connection.connect
     begin
       # If we're not playing, return nil
-      if @mpd_connection.playing?
+      unless @mpd_connection.playing?
         return nil
       end
 

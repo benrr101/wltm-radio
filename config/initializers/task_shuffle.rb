@@ -11,13 +11,17 @@ Rails.application.config.after_initialize do
   s = Rufus::Scheduler.singleton
 
   # Setup the task to run every 10s
-  s.every '10s' do
+  s.every '10s', overlap: false do
     # If there are less than 10 files in the buffer, add a new one to to the buffer
     buffer_count = BufferRecord.count
     if buffer_count < Rails.configuration.queues['buffer_max_tracks']
       # Get all the eligible files, shuffle, and pick one
       shuffle_files = FileSystem.get_all_shuffle_files
       shuffle_files = shuffle_files.shuffle
+      if shuffle_files.count == 0
+        Rails.logger.error('Failed to find tracks to add to buffer!')
+      end
+
       shuffle_pick = shuffle_files[0]
 
       # Add it to the buffer
