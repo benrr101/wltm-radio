@@ -17,5 +17,8 @@ module WLTMRadioApi2
 
     # Load up the queue config
     Rails.configuration.queues = config_for(:queues)
+
+    # Load up the MPD config
+    Rails.configuration.mpd = config_for(:mpd)
   end
 end

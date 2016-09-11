@@ -30,6 +30,9 @@ gem 'jbuilder', '~> 2.5'
 # This project uses rufus-scheduler to do background jobs
 gem 'rufus-scheduler'
 
+# To interface with MPD we use ruby-mpd
+gem 'ruby-mpd'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
