@@ -33,8 +33,9 @@ gem 'rufus-scheduler'
 # To interface with MPD we use ruby-mpd
 gem 'ruby-mpd'
 
-# Use Capistrano for deployment
-# gem 'capistrano-rails', group: :development
+# Gems to access status of the various components
+gem 'sys-filesystem'
+gem 'sys-proctable'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

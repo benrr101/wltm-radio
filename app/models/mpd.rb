@@ -1,6 +1,29 @@
 require 'ruby-mpd'
+require 'sys/proctable'
 
 class Mpd
+
+  class Status
+
+    def initialize(is_running, accepting, queue_size)
+      @accepting_connections = accepting
+      @is_running = is_running
+      @queue_size = queue_size
+    end
+
+    def accepting_connections
+      @accepting_connections
+    end
+
+    def is_running
+      @is_running
+    end
+
+    def queue_size
+      @queue_size
+    end
+
+  end
 
   # Connection to MPD
   @mpd_connection = nil
@@ -11,6 +34,26 @@ class Mpd
   end
 
   # INSTANCE METHODS #######################################################
+
+  def get_status
+    # Determine if MPD is running
+    mpd_procs = Sys::ProcTable.ps.select{|process| process.name == 'mpd'}
+    is_running = mpd_procs.count > 0
+
+    # Determine how willing MPD is to accept connections
+    begin
+      @mpd_connection.connect
+      accepting_connections = true
+      queue_length = @mpd_connection.queue.count
+    rescue
+      accepting_connections = false
+      queue_length = nil
+    ensure
+      @mpd_connection.disconnect
+    end
+
+    return Status.new(is_running, accepting_connections, queue_length)
+  end
 
   # Adds a track to the play queue based on its absolute path
   # @param [string] abs_path  Absolute path to the track to add to the queue
