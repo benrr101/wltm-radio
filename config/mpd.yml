@@ -2,12 +2,16 @@
 # Custom configuration for interacting with MPD
 
 default: &default
+  # Enables MPD methods, enables disabling of MPD support on development servers
+  enable: true
+
   # Local socket file for accessing MPD
   # NOTE: MPD via UNIX socket is the only supported method of connecting to MPD at this time
   socket: /run/mpd/socket
 
 development:
   <<: *default
+  enable: false
 
 test:
   <<: *default
