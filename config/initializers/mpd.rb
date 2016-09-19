@@ -5,7 +5,7 @@
 Rails.application.config.after_initialize do
   # Only define the task if we're in a server environment
   unless (defined?(Rails::Server) || defined?(ENV['server_mode'])) && Rails.configuration.mpd['enable']
-    Rails.logger.info('MPD will not be initialized, Rails is not a server environment, or MPD support is disabled')
+    Rails.logger.warn('MPD will not be initialized, Rails is not a server environment, or MPD support is disabled')
     next
   end
 

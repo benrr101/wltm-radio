@@ -32,7 +32,7 @@ Rails.application.config.after_initialize do
 
       # Add it to MPD's queue
       begin
-        Rails.logger.info('Adding track from buffer')
+        Rails.logger.info("Adding to MPD playlist: #{File.basename(buffer_file.absolute_path)}")
         file_uri = "file:///#{buffer_file.absolute_path}"
         mpd.queue_add(file_uri)
       rescue Exception => e
@@ -49,7 +49,7 @@ Rails.application.config.after_initialize do
          played_time: DateTime.now + 10.seconds
       )
     else
-      Rails.logger.info("Current track has #{remaining_time}s left and #{mpd.queue_length} track in queue, no tracks will be added to queue")
+      Rails.logger.debug("Current track has #{remaining_time}s left and #{mpd.queue_length} track in queue, no tracks will be added to queue")
     end
   end
 end

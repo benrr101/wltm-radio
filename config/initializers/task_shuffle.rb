@@ -9,7 +9,7 @@ require 'rufus-scheduler'
 Rails.application.config.after_initialize do
   # Only define the task if we're in a server environment
   unless defined?(Rails::Server) || defined?(ENV['server_name'])
-    Rails.logger.info('Shuffler task will not be enabled since we are not in a server environment')
+    Rails.logger.warn('Shuffler task will not be enabled since we are not in a server environment')
     next
   end
 
@@ -32,14 +32,14 @@ Rails.application.config.after_initialize do
 
       # Add it to the buffer
       # TODO: Top off buffer instead of adding one
-      Rails.logger.info("Adding 1 track to buffer: '#{shuffle_pick}'")
+      Rails.logger.info("Adding 1 track to buffer: #{File.basename(shuffle_pick)}")
       BufferRecord.create(
           absolute_path: shuffle_pick,
           on_behalf_of: 'shuffle_bot',
           bot_queued: true
       )
     else
-      Rails.logger.info("Buffer contains #{buffer_count} tracks, no more will be added")
+      Rails.logger.debug("Buffer contains #{buffer_count} tracks, no more will be added")
     end
   end
 end
