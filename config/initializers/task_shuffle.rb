@@ -8,7 +8,7 @@ require 'rufus-scheduler'
 
 Rails.application.config.after_initialize do
   # Only define the task if we're in a server environment
-  if (not defined?(Rails::Server)) || File.split($0).last == 'rake'
+  unless defined?(Rails::Server) || defined?(ENV['server_name'])
     Rails.logger.info('Shuffler task will not be enabled since we are not in a server environment')
     next
   end

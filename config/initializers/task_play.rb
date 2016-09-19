@@ -7,8 +7,8 @@ require 'rufus-scheduler'
 #   met, a track from the buffer will be removed and added to the queue.
 Rails.application.config.after_initialize do
   # Only define the task if we're in a server environment with MPD enabled
-  if (not defined?(Rails::Server)) || File.split($0).last == 'rake' || (not Rails.configuration.mpd['enable'])
-    Rails.logger.info('Player task will not be enabled, this is not a server environment, or MPD support is disabled')
+  unless (defined?(Rails::Server) || defined?(ENV['server_mode'])) && Rails.configuration.mpd['enable']
+    Rails.logger.warn('Player task will not be enabled, this is not a server environment, or MPD support is disabled')
     next
   end
 
