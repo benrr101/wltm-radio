@@ -3,7 +3,7 @@
 
 default: &default
   # Enables MPD methods, enables disabling of MPD support on development servers
-  enable: true
+  enable: false
 
   # Local socket file for accessing MPD
   # NOTE: MPD via UNIX socket is the only supported method of connecting to MPD at this time
