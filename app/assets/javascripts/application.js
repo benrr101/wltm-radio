@@ -12,4 +12,5 @@
 //
 //= require jquery
 //= require knockout
+//= require bootstrap-sprockets
 //= require_tree .

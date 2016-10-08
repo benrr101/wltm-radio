@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  # GET /index, the default route
+  root :to => 'index#index'
+  get 'index', to: 'index#index'
+
   namespace :api, constraints: {format: 'json'}, defaults: {format: 'json'} do
     # GET /stats/share
     get '/stats/share', to: 'stats#share'
