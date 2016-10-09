@@ -13,6 +13,7 @@ class FileSystem
       @inuse_gb = (stat.blocks - stat.blocks_free) * stat.block_size / 1024 / 1024 / 1024
 
       @inuse_percent = @inuse_gb.to_f / @total_gb * 100.0
+      @inuse_percent = @inuse_percent.round(1);
       @free_percent = 100 - @inuse_percent
     end
 

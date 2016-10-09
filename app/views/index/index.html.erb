@@ -43,7 +43,18 @@
         <h3 class="panel-title">File Share</h3>
       </div>
       <div class="panel-body">
-        status
+        <!-- ko if: !fileShareStatus -->
+        <span class="glyphicon glyphicon-refresh"></span>
+        Loading...
+        <!-- /ko -->
+        <!-- ko if: fileShareStatus -->
+            <span class="glyphicon glyphicon-ok ok-status" data-bind="visible: fileShareStatus().inuse_percent < 75"></span>
+            <span class="glyphicon glyphicon-asterisk warn-status" data-bind="visible: fileShareStatus().inuse_percent >= 75 && fileShareStatus().inuse_pecent < 95"></span>
+            <span class="glyphicon glyphicon-remove" data-bind="visible: fileShareStatus().inuse_percent >= 95"></span>
+            <span data-bind="text: fileShareStatus().inuse_gb"></span> /
+            <span data-bind="text: fileShareStatus().total_gb"></span> GB Used
+            (<span data-bind="text: fileShareStatus().free_percent"></span>% Free)
+        <!-- /ko -->
       </div>
     </div>
   </div>
@@ -53,7 +64,20 @@
         <h3 class="panel-title">MPD</h3>
       </div>
       <div class="panel-body">
-        status
+        <!-- ko if: !mpdStatus -->
+          <span class="glyphicon glyphicon-refresh"></span>
+          Loading...
+        <!-- /ko -->
+        <!-- ko if: mpdStatus -->
+          <!-- ko if: mpdStatus().is_running -->
+            <span class="glyphicon glyphicon-ok ok-status"></span>
+            <span class="ok-status">Running</span>
+          <!-- /ko -->
+          <!-- ko if: !mpdStatus().is_running -->
+            <span class="glyphicon glyphicon-remove not-ok-status"></span>
+            <span class="not-ok-status">Not Running</span>
+          <!-- /ko -->
+        <!-- /ko -->
       </div>
     </div>
   </div>
@@ -63,9 +87,25 @@
         <h3 class="panel-title">Icecast</h3>
       </div>
       <div class="panel-body">
-        status
+        <!-- ko if: !icecastStatus -->
+          <span class="glyphicon glyphicon-refresh"></span>
+          Loading...
+        <!-- /ko -->
+        <!-- ko if: icecastStatus -->
+          <!-- ko if: icecastStatus().is_running -->
+            <span class="glyphicon glyphicon-ok ok-status"></span>
+            <span class="ok-status">Running</span>
+          <!-- /ko -->
+
+          <!-- ko if: !icecastStatus().is_running -->
+            <span class="glyphicon glyphicon-remove not-ok-status"></span>
+            <span class="not-ok-status">Not Running</span>
+          <!-- /ko -->
+        <!-- /ko -->
       </div>
     </div>
   </div>
 </div>
 </div>
+
+<% javascript_tag 'ko_index' %>

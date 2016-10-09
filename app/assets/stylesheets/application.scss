@@ -7,4 +7,6 @@ body { padding-top: 60px; }
 html, body {height:100%; width:100%}
 
 @import "bootswatch/darkly/bootswatch";
-
+.ok-status { color: $brand-success; }
+.warn-status { color: $brand-warning; }
+.not-ok-status { color: $brand-danger; }
