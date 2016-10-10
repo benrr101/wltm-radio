@@ -20,5 +20,8 @@ module WLTMRadioApi2
 
     # Load up the MPD config
     Rails.configuration.mpd = config_for(:mpd)
+
+    # Load up the config for Icecast
+    Rails.configuration.icecast = config_for(:icecast)
   end
 end
