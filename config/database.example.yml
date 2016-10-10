@@ -16,6 +16,7 @@ default: &default
   username: 
   password:
   host: 
+  reconnect: true
 
 development:
   <<: *default

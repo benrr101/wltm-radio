@@ -4,7 +4,7 @@
   height: 400px;
   max-width: 100%;
   background-size: cover;
-  background: image-url("background.jpg") center;
+  background: asset-url("background.jpg") center;
 }
 
 .container-full-bg .container, .container-full-bg .container .jumbotron {
