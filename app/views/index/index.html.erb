@@ -68,16 +68,25 @@
           <span class="glyphicon glyphicon-refresh"></span>
           Loading...
         <!-- /ko -->
-        <!-- ko if: mpdStatus -->
-          <!-- ko if: mpdStatus().is_running -->
+        <div class="row" data-bind="if: mpdStatus">
+          <div class="col-xs-6">
+            <!-- ko if: mpdStatus().is_running -->
             <span class="glyphicon glyphicon-ok ok-status"></span>
             <span class="ok-status">Running</span>
-          <!-- /ko -->
-          <!-- ko if: !mpdStatus().is_running -->
+            <!-- /ko -->
+            <!-- ko if: !mpdStatus().is_running -->
             <span class="glyphicon glyphicon-remove not-ok-status"></span>
             <span class="not-ok-status">Not Running</span>
-          <!-- /ko -->
-        <!-- /ko -->
+            <!-- /ko -->
+          </div>
+          <div class="col-xs-6">
+            <!-- ko if: !mpdStatus().queue_length || mpdStatus().queue_length > 2 || mpdStatus().queue_length < 1 -->
+              <span class="glyphicon glyphicon-remove not-ok-status"></span>
+              <span class="not-ok-status">Queue Unhealthy</span>
+              (<span data-bind="text: mpdStatus().queue_length"></span>)
+            <!-- /ko -->
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -91,17 +100,34 @@
           <span class="glyphicon glyphicon-refresh"></span>
           Loading...
         <!-- /ko -->
-        <!-- ko if: icecastStatus -->
-          <!-- ko if: icecastStatus().is_running -->
-            <span class="glyphicon glyphicon-ok ok-status"></span>
-            <span class="ok-status">Running</span>
-          <!-- /ko -->
-
-          <!-- ko if: !icecastStatus().is_running -->
-            <span class="glyphicon glyphicon-remove not-ok-status"></span>
-            <span class="not-ok-status">Not Running</span>
-          <!-- /ko -->
-        <!-- /ko -->
+        <div class='row' data-bind='if: icecastStatus'>
+          <div class="col-xs-6">
+            <!-- ko if: icecastStatus().is_running -->
+              <span class="glyphicon glyphicon-ok ok-status"></span>
+              <span class="ok-status">Running</span>
+            <!-- /ko -->
+            <!-- ko if: !icecastStatus().is_running -->
+              <span class="glyphicon glyphicon-remove not-ok-status"></span>
+              <span class="not-ok-status">Not Running</span>
+            <!-- /ko -->
+          </div>
+          <div class="col-xs-6">
+            <!-- ko if: icecastStatus().connection_ratio < 0.9 -->
+              <span class="glyphicon glyphicon-ok ok-status"></span>
+              <span class="ok-status">
+                <span data-bind="text: icecastStatus().current_listeners"></span> /
+                <span data-bind="text: icecastStatus().max_listeners == null ? '&infin;' : icecastStatus().max_listeners"></span> Listeners
+              </span>
+            <!-- /ko -->
+            <!-- ko if: icecastStatus().connection_ratio >= 0.9 -->
+              <span class="glypicon glyphicon-asterisk warn-status"></span>
+              <span class="warn-status">
+                <span data-bind="text: icecastStatus().current_listeners"></span> /
+                <span data-bind="text: icecastStatus().max_listeners == null ? '&infin;' : icecastStatus().max_listeners"></span> Listeners
+              </span>
+            <!-- /ko -->
+          </div>
+        </div>
       </div>
     </div>
   </div>

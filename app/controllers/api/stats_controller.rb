@@ -20,7 +20,7 @@ module Api
 
     # GET /stats/icecast
     def icecast
-      icecast_stat = Icecast.get_status
+      icecast_stat = IcecastStatus.get_status
       render :json => icecast_stat
     end
   end

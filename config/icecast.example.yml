@@ -1,0 +1,21 @@
+############################################################################
+# Custom configuration for icecast configuration for monitoring
+
+default: &default
+  # Hostname for the icecast instance, usually localhost
+  hostname: localhost
+
+  # Port for the icecast instance, usually 8000
+  port: 8000
+
+  # Admin account password
+  admin_password:
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default
