@@ -36,8 +36,7 @@ class IcecastStatus
     }
 
     begin
-      Icecast::Server.cache = Rails.cache             # This is to work around a bug in the Icecast gem
-      Rails.logger.warn(Icecast::Server.cache.inspect)
+      Icecast::Server.cache = Icecast::Server::NullCache.new      # This is to work around a bug in the Icecast gem
       icecast_status = Icecast::Server.new(server_attribs).status.parsed_status['icestats']
       is_running = true
 
