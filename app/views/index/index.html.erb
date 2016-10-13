@@ -80,11 +80,15 @@
             <!-- /ko -->
           </div>
           <div class="col-xs-6">
-            <!-- ko if: !mpdStatus().queue_length || mpdStatus().queue_length > 2 || mpdStatus().queue_length < 1 -->
+            <!-- ko if: !mpdStatus().queue_size || mpdStatus().queue_size > 2 || mpdStatus().queue_size < 1 -->
               <span class="glyphicon glyphicon-remove not-ok-status"></span>
               <span class="not-ok-status">Queue Unhealthy</span>
-              (<span data-bind="text: mpdStatus().queue_length"></span>)
             <!-- /ko -->
+            <!-- ko ifnot: !mpdStatus().queue_size || mpdStatus().queue_size > 2 || mpdStatus().queue_size < 1 -->
+              <span class="glyphicon glyphicon-remove not-ok-status"></span>
+              <span class="not-ok-status">Queue Unhealthy</span>
+            <!-- /ko -->
+            (<span data-bind="text: mpdStatus().queue_length"></span>)
           </div>
         </div>
       </div>
