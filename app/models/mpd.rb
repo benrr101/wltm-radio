@@ -1,18 +1,14 @@
 require 'ruby-mpd'
-require 'sys/proctable'
 
 class Mpd
 
   class Status
 
-    def initialize(is_running, accepting, queue_size)
-      @accepting_connections = accepting
+    def initialize(is_running, queue_size, current_track, who)
       @is_running = is_running
       @queue_size = queue_size
-    end
-
-    def accepting_connections
-      @accepting_connections
+      @current_track = current_track
+      @who = who
     end
 
     def is_running
@@ -21,6 +17,14 @@ class Mpd
 
     def queue_size
       @queue_size
+    end
+
+    def current_track
+      @current_track
+    end
+
+    def who
+      @who
     end
 
   end
@@ -36,23 +40,26 @@ class Mpd
   # INSTANCE METHODS #######################################################
 
   def get_status
-    # Determine if MPD is running
-    mpd_procs = Sys::ProcTable.ps.select{|process| process.name == 'mpd'}
-    is_running = mpd_procs.count > 0
-
     # Determine how willing MPD is to accept connections
     begin
       @mpd_connection.connect
-      accepting_connections = true
+      is_running = true
       queue_length = @mpd_connection.queue.count
+
+      current_track_obj = @mpd_connection.current_song
+      current_track = "#{current_track_obj.artist} - #{current_track_obj.title}"
+      who = @mpd_connection.current_song.file.sub(Rails.configuration.files['base_path'], '').sub(File::SEPARATOR, '').split(File::SEPARATOR)[0]
+
     rescue
-      accepting_connections = false
+      is_running = false
       queue_length = nil
+      current_track = nil
+      who = nil
     ensure
       @mpd_connection.disconnect
     end
 
-    return Status.new(is_running, accepting_connections, queue_length)
+    Status.new(is_running, queue_length, current_track, who)
   end
 
   # Adds a track to the play queue based on its absolute path
