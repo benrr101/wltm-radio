@@ -5,8 +5,8 @@
       <h1>WLTM</h1>
       <p>walter melon radio is the place to hear everyone's music.</p>
       <p data-bind="if: mpdStatus">
-        Currently Playing:
-        <span data-bind="text: mpdStatus().current_track"></span><br/>
+        Currently Playing:<br/>
+        <span data-bind="text: mpdStatus().current_track"></span>
         <span class="label label-default" data-bind="text: mpdStatus().who"></span>
       </p>
     </div>
