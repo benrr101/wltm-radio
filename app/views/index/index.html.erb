@@ -6,7 +6,7 @@
       <p>walter melon radio is the place to hear everyone's music.</p>
       <p data-bind="if: mpdStatus">
         Currently Playing:
-        <span data-bind="text: mpdStatus().current_track"></span>
+        <span data-bind="text: mpdStatus().current_track"></span><br/>
         <span class="label label-default" data-bind="text: mpdStatus().who"></span>
       </p>
     </div>
@@ -85,15 +85,15 @@
             <!-- /ko -->
           </div>
           <div class="col-xs-6">
-            <!-- ko if: !mpdStatus().queue_size || mpdStatus().queue_size > 2 || mpdStatus().queue_size < 1 -->
+            <!-- ko if: !mpdStatus() || mpdStatus().queue_size > 2 || mpdStatus().queue_size < 1 -->
               <span class="glyphicon glyphicon-remove not-ok-status"></span>
               <span class="not-ok-status">Queue Unhealthy</span>
             <!-- /ko -->
             <!-- ko ifnot: !mpdStatus().queue_size || mpdStatus().queue_size > 2 || mpdStatus().queue_size < 1 -->
-              <span class="glyphicon glyphicon-remove not-ok-status"></span>
-              <span class="not-ok-status">Queue Unhealthy</span>
+              <span class="glyphicon glyphicon-ok ok-status"></span>
+              <span class="ok-status">Queue Healthy</span>
             <!-- /ko -->
-            (<span data-bind="text: mpdStatus().queue_length"></span>)
+            (<span data-bind="text: mpdStatus().queue_size"></span>)
           </div>
         </div>
       </div>
