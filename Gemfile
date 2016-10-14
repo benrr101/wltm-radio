@@ -36,7 +36,6 @@ gem 'ruby-mpd'
 
 # Gems to access status of the various components
 gem 'sys-filesystem'
-gem 'sys-proctable'
 gem 'icecast'
 
 group :development, :test do
