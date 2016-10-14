@@ -13,7 +13,7 @@ class FileSystem
       @inuse_gb = (stat.blocks - stat.blocks_free) * stat.block_size / 1024 / 1024 / 1024
 
       @inuse_percent = @inuse_gb.to_f / @total_gb * 100.0
-      @inuse_percent = @inuse_percent.round(1);
+      @inuse_percent = @inuse_percent.round(1)
       @free_percent = 100 - @inuse_percent
     end
 
@@ -44,6 +44,9 @@ class FileSystem
 
   end
 
+  # CLASS VARIABLES ########################################################
+  @@base_folder_selection = 0
+
   # CLASS METHODS ##########################################################
 
   # Retrieve statistics about free space
@@ -58,14 +61,25 @@ class FileSystem
   # @return [Array[string]] An array of strings that should be shuffled
   def self.get_all_shuffle_files
 
-    # Generate a list of globbings to glob
-    globbings = []
+    # Glob the base folders
+    base_folders = []
     Rails.configuration.files['included_folders'].each do |folder|
       folder = File.join(Rails.configuration.files['base_path'], folder)
-      Rails.configuration.files['allowed_extensions'].each do |allowed_extension|
-        glob = File.join(folder, '**/*.' + allowed_extension)
-        globbings.push(glob)
-      end
+      base_folders += Dir.glob(folder)
+    end
+    Rails.logger.debug(base_folders)
+
+    # Select the base folder for this selection
+    @@base_folder_selection
+    selected_base_folder = base_folders[@@base_folder_selection]
+    @@base_folder_selection = (@@base_folder_selection + 1) % base_folders.length
+    Rails.logger.debug("Picking file from selected base folder #{@@base_folder_selection} #{selected_base_folder}")
+
+    # Generate globs for the different filetypes
+    globbings = []
+    Rails.configuration.files['allowed_extensions'].each do |allowed_extension|
+      glob = File.join(selected_base_folder, "**/*.#{allowed_extension}")
+      globbings.push(glob)
     end
 
     # Go through each folder and find the files that are allowed
