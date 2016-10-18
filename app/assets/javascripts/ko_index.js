@@ -7,6 +7,9 @@ function StatusViewModel() {
     self.icecastStatus = ko.observable(null);
     self.fileShareStatus = ko.observable();
 
+    self.webPlayerHighVisible = ko.observable(false);
+    self.webPlayerLowVisible = ko.observable(false);
+
     // ACTIONS /////////////////////////////////////////////////////////////
     self.getStatus = function() {
         $.ajax({
@@ -35,6 +38,14 @@ function StatusViewModel() {
         }).success(function(data) {
             self.icecastStatus(data);
         });
+    };
+
+    self.showHighWebPlayer = function() {
+        self.webPlayerHighVisible(true);
+    }
+
+    self.showLowWebPlayer = function() {
+        self.webPlayerLowVisible(true);
     };
 }
 var vm = new StatusViewModel();

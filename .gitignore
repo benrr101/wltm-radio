@@ -37,6 +37,7 @@ Gemfile.lock
 # Ignore sensitive files
 /config/files.yml
 /config/database.yml
+/config/icecast.yml
 /config/secrets.yml
 /config/initializers/secret_token.rb
 .env

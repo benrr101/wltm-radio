@@ -11,6 +11,9 @@ default: &default
   # Admin account password
   admin_password:
 
+  # Base address for all icecast paths
+  icecast_base: http://localhost:8000/
+
 development:
   <<: *default
 
