@@ -4,34 +4,62 @@ require 'ruby-mpd'
 
     class Status
 
-      def initialize(is_running, queue_size, current_track, who, time)
+      def initialize(is_running, queue_size, current_track)
         @is_running = is_running
         @queue_size = queue_size
         @current_track = current_track
-        @who = who
-        @time = time
       end
 
+      # @return [bool]  Whether or not MPD is currently running
       def is_running
         @is_running
       end
 
+      # @return [int] Number of tracks currently in the MPD queue
       def queue_size
         @queue_size
       end
 
+      # @return [NowPlaying] Information about the currently playing track
       def current_track
         @current_track
       end
+    end
 
-      def time
-        @time
+    class NowPlaying
+
+      # @param [string] artist  Name of the artist
+      # @param [string] album Name of the album
+      # @param [string] title Title of the track
+      # @param [Time] time  Time statistics about the track
+      # @param [string] who User that uploaded the track
+      def initialize(artist, album, title, time, who)
+        @artist = artist
+        @album = album
+        @title = title
+        @time_stats = time
+        @who = who
+      end
+
+      def artist
+        @artist
+      end
+
+      def album
+        @album
+      end
+
+      def title
+        @title
+      end
+
+      def time_stats
+        @time_stats
       end
 
       def who
         @who
       end
-
     end
 
     class Time
@@ -73,23 +101,20 @@ require 'ruby-mpd'
         is_running = true
         queue_length = @mpd_connection.queue.count
 
-        current_track_obj = @mpd_connection.current_song
-        current_track = "#{current_track_obj.artist} - #{current_track_obj.title}"
-        who = @mpd_connection.current_song.file.sub(Rails.configuration.files['base_path'], '').sub(File::SEPARATOR, '').split(File::SEPARATOR)[0]
-
-        # Calculate the time object
+        track = @mpd_connection.current_song
+        who = track.file.sub(Rails.configuration.files['base_path'], '').sub(File::SEPARATOR, '').split(File::SEPARATOR)[0]
         time = Mpd.get_time(@mpd_connection)
+
+        now_playing = NowPlaying.new(track.artist, track.album, track.title, time, who)
       rescue
         is_running = false
         queue_length = nil
-        current_track = nil
-        who = nil
-        time = nil
+        now_playing = nil
       ensure
         @mpd_connection.disconnect
       end
 
-      Status.new(is_running, queue_length, current_track, who, time)
+      Status.new(is_running, queue_length, now_playing)
     end
 
     # Adds a track to the play queue based on its absolute path

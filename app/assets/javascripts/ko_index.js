@@ -42,7 +42,7 @@ function StatusViewModel() {
 
     self.showHighWebPlayer = function() {
         self.webPlayerHighVisible(true);
-    }
+    };
 
     self.showLowWebPlayer = function() {
         self.webPlayerLowVisible(true);
