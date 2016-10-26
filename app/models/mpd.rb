@@ -4,11 +4,12 @@ class Mpd
 
   class Status
 
-    def initialize(is_running, queue_size, current_track, who)
+    def initialize(is_running, queue_size, current_track, who, time)
       @is_running = is_running
       @queue_size = queue_size
       @current_track = current_track
       @who = who
+      @time = time
     end
 
     def is_running
@@ -23,8 +24,34 @@ class Mpd
       @current_track
     end
 
+    def time
+      @time
+    end
+
     def who
       @who
+    end
+
+    end
+
+  class Time
+
+    def initialize(seconds_elapsed, seconds_remaining, seconds_total)
+      @seconds_elapsed = seconds_elapsed
+      @seconds_remaining = seconds_remaining
+      @seconds_total = seconds_total
+    end
+
+    def seconds_elapsed
+      @seconds_elapsed
+    end
+
+    def seconds_remaining
+      @seconds_remaining
+    end
+
+    def seconds_total
+      @seconds_total
     end
 
   end
@@ -50,16 +77,19 @@ class Mpd
       current_track = "#{current_track_obj.artist} - #{current_track_obj.title}"
       who = @mpd_connection.current_song.file.sub(Rails.configuration.files['base_path'], '').sub(File::SEPARATOR, '').split(File::SEPARATOR)[0]
 
+      # Calculate the time object
+      time = Mpd.get_time(@mpd_connection)
     rescue
       is_running = false
       queue_length = nil
       current_track = nil
       who = nil
+      time = nil
     ensure
       @mpd_connection.disconnect
     end
 
-    Status.new(is_running, queue_length, current_track, who)
+    Status.new(is_running, queue_length, current_track, who, time)
   end
 
   # Adds a track to the play queue based on its absolute path
@@ -103,10 +133,7 @@ class Mpd
       end
 
       # We are playing, so return the number of seconds that are left
-      seconds_played = @mpd_connection.status[:time][0]
-      seconds_total = @mpd_connection.status[:time][1]
-      seconds_left = seconds_total - seconds_played
-      return seconds_left
+      return Mpd.get_time(@mpd_connection).seconds_remaining
     ensure
       @mpd_connection.disconnect
     end
@@ -122,6 +149,23 @@ class Mpd
       return @mpd_connection.consume = true
     ensure
       @mpd_connection.disconnect
+    end
+  end
+
+  # PRIVATE HELPERS ########################################################
+
+  # Fetches the time stats for the currently playing track
+  # @param [MPD]  The MPD connection to use to get the time for current track
+  # @return [Time]  Object with details of the time
+  private
+  def self.get_time(mpd_connection)
+    begin
+      seconds_elapsed = mpd_connection.status[:time][0]
+      seconds_total = mpd_connection.status[:time][1]
+      seconds_remaining = seconds_total - seconds_elapsed
+      return Time.new(seconds_elapsed, seconds_remaining, seconds_total)
+    rescue
+      return nil
     end
   end
 end
