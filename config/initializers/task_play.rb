@@ -21,7 +21,7 @@ Rails.application.config.after_initialize do
     # 10 seconds, add another one from the buffer
     mpd = Mpd.new
     remaining_time = mpd.remaining_time
-    if remaining_time.nil? || (remaining_time <= 10 && mpd.queue_length < 2)
+    if mpd.queue_length < 2 && (remaining_time.nil? || remaining_time <= 10)
       # Pop the top of the buffer
       buffer_file = BufferRecord.first
       if buffer_file.nil?
