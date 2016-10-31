@@ -67,7 +67,6 @@ class FileSystem
       folder = File.join(Rails.configuration.files['base_path'], folder)
       base_folders += Dir.glob(folder)
     end
-    Rails.logger.debug(base_folders)
 
     # Select the base folder for this selection
     @@base_folder_selection

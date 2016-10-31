@@ -38,6 +38,9 @@ gem 'ruby-mpd'
 gem 'sys-filesystem'
 gem 'icecast'
 
+# Get the metadata of the track
+gem 'ruby-audioinfo'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri
