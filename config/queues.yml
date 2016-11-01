@@ -5,6 +5,12 @@ default: &default
   # Maximum number of tracks to have queued in the buffer
   buffer_max_tracks: 10
 
+  # If a track is shorter than this number of seconds, it will be enqueued with the tracks before and after it
+  bookend_threshold: 90
+
+  # If a track has been played within the last number of seconds, it will be skipped
+  replay_limit: 7200
+
 development:
   <<: *default
 

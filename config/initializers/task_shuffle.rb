@@ -35,6 +35,13 @@ Rails.application.config.after_initialize do
       shuffle_pick = shuffled_files[0]
       files_to_add = [shuffle_pick]
 
+      # If the track has been played in the last amount of time, don't play it again
+      history_time = DateTime.now - Rails.configuration.queues['replay_limit'].seconds
+      if HistoryRecord.where(absolute_path: shuffle_pick).where(HistoryRecord.arel_table[:played_time].gt(history_time)).any?
+        Rails.logger.info("#{shuffle_pick} was played after #{history_time}, it will be skipped")
+        continue
+      end
+
       # If the track is too short, add track before and after it
       if AudioInfo.new(shuffle_pick).length <= Rails.configuration.queues['bookend_threshold']
         Rails.logger.debug("#{shuffle_pick} is too short, adding tracks before and after it")
@@ -49,7 +56,7 @@ Rails.application.config.after_initialize do
       # Add all the tracks to the buffer
       Rails.logger.info("Adding #{files_to_add.length} track to buffer: #{files_to_add.map {|file| File.basename(file)}.join(', ')}")
       files_to_add.each do |file|
-        Buffer.create(
+        BufferRecord.create(
           absolute_path: file,
           on_behalf_of: 'shuffle',
           bot_queued: true
