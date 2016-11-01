@@ -4,7 +4,7 @@
     <div class="jumbotron">
       <h1>WLTM</h1>
       <p>walter melon radio is the place to hear everyone's music.</p>
-      <p data-bind="if: !mpdStatus()">
+      <p data-bind="visible: mpdStatus">
         Currently Playing:<br/>
         <span data-bind="visible: mpdStatus().current_track.artist, text: mpdStatus().current_track.artist"></span>
         <span data-bind="visible: !mpdStatus().current_track.artist">Unknown Artist</span> -

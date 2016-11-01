@@ -62,6 +62,8 @@ Rails.application.config.after_initialize do
           bot_queued: true
         )
       end
+
+      buffer_count = BufferRecord.count
     end
   end
 end
