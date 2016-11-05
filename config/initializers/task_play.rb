@@ -44,7 +44,7 @@ Rails.application.config.after_initialize do
       # Add the track to the track table if it isn't already in there
       track_record = Track.find_or_create_by!(absolute_path: buffer_file.absolute_path) do |track|
         # Pull the information about the track out of the file
-        track_info = AudioInfo.new(path)
+        track_info = AudioInfo.new(buffer_file.absolute_path)
         track.artist = track_info.artist || 'Unknown Artist'
         track.album = track_info.album || 'Unknown Album'
         track.title = track_info.title || 'Unknown Title',

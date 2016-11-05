@@ -27,6 +27,8 @@ class CreateTracks < ActiveRecord::Migration
 
     # Load the unique history records into the track table
     HistoryRecord.distinct.pluck(:absolute_path).each do |path|
+      say("Adding #{path}", :subitem)
+
       # Pull the information about the track out of the file
       begin
         track_info = AudioInfo.new(path)
@@ -46,6 +48,7 @@ class CreateTracks < ActiveRecord::Migration
 
     # Set track of each history item to the id of the corresponding track
     HistoryRecord.all.each do |record|
+      say("Updating #{record.absolute_path}", :subitem)
       begin
         track_id = Track.find_by!(absolute_path: record.absolute_path)
         record.update_attribute(:track_id, track_id.id)
