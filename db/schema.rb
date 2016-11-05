@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160906195052) do
+ActiveRecord::Schema.define(version: 20161101110400) do
 
   create_table "buffer_records", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string   "absolute_path"
@@ -21,13 +21,26 @@ ActiveRecord::Schema.define(version: 20160906195052) do
   end
 
   create_table "history_records", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.string   "absolute_path"
-    t.string   "display_name"
     t.string   "on_behalf_of"
     t.boolean  "bot_queued"
     t.datetime "played_time"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+    t.integer  "track_id"
+    t.index ["track_id"], name: "index_history_records_on_track_id", using: :btree
   end
 
+  create_table "tracks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.string   "absolute_path", null: false
+    t.string   "artist"
+    t.string   "album"
+    t.string   "title"
+    t.string   "uploader"
+    t.integer  "length"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["absolute_path"], name: "index_tracks_on_absolute_path", unique: true, using: :btree
+  end
+
+  add_foreign_key "history_records", "tracks"
 end

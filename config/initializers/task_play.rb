@@ -1,4 +1,5 @@
 require 'rufus-scheduler'
+require 'active_support/time'
 
 ############################################################################
 # Player Enqueue Task
@@ -40,13 +41,22 @@ Rails.application.config.after_initialize do
         next
       end
 
-      # Add a history record of the track that was added
+      # Add the track to the track table if it isn't already in there
+      track_record = Track.find_or_create_by!(absolute_path: buffer_file.absolute_path) do |track|
+        # Pull the information about the track out of the file
+        track_info = AudioInfo.new(path)
+        track.artist = track_info.artist || 'Unknown Artist'
+        track.album = track_info.album || 'Unknown Album'
+        track.title = track_info.title || 'Unknown Title',
+        track.uploader = FileSystem::get_track_uploader(buffer_file.absolute_path)
+        track.length = track_info.length.round(0)
+      end
+
       HistoryRecord.create(
-         absolute_path: buffer_file.absolute_path,
-         display_name: File.basename(buffer_file.absolute_path),
          on_behalf_of: buffer_file.on_behalf_of,
          bot_queued: buffer_file.bot_queued,
-         played_time: DateTime.now + 10.seconds
+         played_time: DateTime.now + remaining_time.seconds,
+         track_id: track_record.id
       )
     else
       Rails.logger.debug("Current track has #{remaining_time}s left and #{mpd.queue_length} track in queue, no tracks will be added to queue")

@@ -90,4 +90,18 @@ class FileSystem
     return files_to_shuffle
 
   end
+
+  # Calculates the uploader of the track
+  # @param path [string]  The absolute path of the track
+  # @return [string]  The uploader of the track
+  def self.get_track_uploader(path)
+    # Strip off the base path
+    working_path = path.sub(Rails.configuration.files['base_path'], '')
+
+    # Strip off any leading slash
+    working_path.sub!(/^#{File::Separator}/, '')
+
+    # Take the first split folder as the uploader
+    return working_path.split(File::Separator)[0]
+  end
 end
