@@ -24,8 +24,7 @@ Rails.application.config.after_initialize do
     until buffer_count > Rails.configuration.queues['buffer_max_tracks']
 
       # Get all the eligible files, shuffle, and pick one
-      unshuffled_files = FileSystem.get_all_shuffle_files
-      shuffled_files = unshuffled_files.shuffle
+      shuffled_files = FileSystem.get_all_shuffle_files.shuffle
       if shuffled_files.count == 0
         Rails.logger.error('Failed to find tracks to add to buffer!')
         return
@@ -45,6 +44,23 @@ Rails.application.config.after_initialize do
       # If the track is too short, add track before and after it
       if AudioInfo.new(shuffle_pick).length <= Rails.configuration.queues['bookend_threshold']
         Rails.logger.debug("#{shuffle_pick} is too short, adding tracks before and after it")
+
+        # Get all the tracks that are in the folder and sort by track number if possible
+        unshuffled_files = FileSystem::get_all_folder_files(File.dirname(shuffle_pick)).sort do |x,y|
+          x_audio = AudioInfo.new(x)
+          y_audio = AudioInfo.new(y)
+
+          # If either of the tracks don't have track numbers, use filenames instead
+          if x_audio.tracknum.nil? || y_audio.tracknum.nil?
+            next x <=> y
+          end
+
+          # TODO Add support for disc number comparison once taglib is working
+          # Sort by the track number
+          next x_audio.tracknum <=> y_audio.tracknum
+        end
+
+
         [0, 2].each do |i|
           bookend_file = unshuffled_files[unshuffled_files.index(shuffle_pick) + (i - 1)]
           unless bookend_file == nil || File.dirname(bookend_file) != File.dirname(shuffle_pick)

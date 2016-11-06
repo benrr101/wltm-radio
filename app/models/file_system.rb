@@ -75,20 +75,27 @@ class FileSystem
     Rails.logger.debug("Picking file from selected base folder #{@@base_folder_selection} #{selected_base_folder}")
 
     # Generate globs for the different filetypes
-    globbings = []
+    files_to_shuffle = []
     Rails.configuration.files['allowed_extensions'].each do |allowed_extension|
       glob = File.join(selected_base_folder, "**/*.#{allowed_extension}")
-      globbings.push(glob)
-    end
-
-    # Go through each folder and find the files that are allowed
-    files_to_shuffle = []
-    globbings.each do |glob|
       files_to_shuffle += Dir.glob(glob)
     end
 
     return files_to_shuffle
+  end
 
+  # Fetches a list of all tracks that are in a given folder
+  # @param folder [string]  The absolute path of the folder to get all tracks from
+  # @returns [Array[string]] An arry of all files in the folder
+  def self.get_all_folder_files(folder)
+    # Generate files that are in the folder
+    files = []
+    Rails.configuration.files['allowed_extensions'].each do |allowed_extension|
+      glob = File.join(folder, "*.#{allowed_extension}")
+      files += Dir.glob(glob)
+    end
+
+    return files
   end
 
   # Calculates the uploader of the track
