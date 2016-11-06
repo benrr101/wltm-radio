@@ -37,7 +37,7 @@ Rails.application.config.after_initialize do
 
       # If the track has been played in the last amount of time, don't play it again
       history_time = DateTime.now - Rails.configuration.queues['replay_limit'].seconds
-      if HistoryRecord.where(absolute_path: shuffle_pick).where(HistoryRecord.arel_table[:played_time].gt(history_time)).any?
+      if HistoryRecord.joins(:track).where(tracks: {absolute_path: shuffle_pick}).where(HistoryRecord.arel_table[:played_time].gt(history_time)).any?
         Rails.logger.info("#{shuffle_pick} was played after #{history_time}, it will be skipped")
         continue
       end
