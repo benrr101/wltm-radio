@@ -7,7 +7,7 @@ class Api::HistoryController < ApplicationController
                :except => [:created_at, :updated_at, :id],
                :methods => [:download_link, :folder_download_link]
            }},
-           :except => [:created_at, :updated_at, :absolute_path, :id]
+           :except => [:created_at, :updated_at, :absolute_path, :id, :track_id]
   end
 
   # GET /history/date?start=?[&end=?][&page=?&pagesize=?][&desc=true]
@@ -58,6 +58,6 @@ class Api::HistoryController < ApplicationController
                :except => [:created_at, :updated_at, :id],
                :methods => [:download_link, :folder_download_link]
            }},
-           :except => [:created_at, :updated_at, :absolute_path, :id]
+           :except => [:created_at, :updated_at, :absolute_path, :id, :track_id]
   end
 end
