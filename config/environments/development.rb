@@ -53,5 +53,5 @@ Rails.application.configure do
   #config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
   # Disable SQL Logging
-  config.log_level = :info
+  config.log_level = :debug
 end

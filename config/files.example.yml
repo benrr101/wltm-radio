@@ -24,6 +24,12 @@ default: &default
     - wma
     - ape
 
+  # Optional, if you want to enable downloading files via WebDAV, base path to WebDAV download service
+  download_base_path: http://path/to/download/base
+
+  # Optional, if you want to enable downloading entire folders, base path to
+  download_folder_base_path: http://path/to/download/folder
+
 development:
   <<: *default
 

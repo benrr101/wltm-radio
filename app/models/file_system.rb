@@ -57,19 +57,25 @@ class FileSystem
     return FileSystem::Status.new(stat)
   end
 
+  # Retrieves all folders that files can be pulled from
+  # @return [Array[string]] Array of folder paths to pull from
+  def self.get_all_folders
+    Rails.cache.fetch('filesystem/folders', expires_in: 1.hours) do
+      # Glob the base folders
+      base_folders = []
+      Rails.configuration.files['included_folders'].each do |folder|
+        folder = File.join(Rails.configuration.files['base_path'], folder)
+        base_folders += Dir.glob(folder)
+      end
+      base_folders
+    end
+  end
+
   # Determines what files should be included in the shuffle
   # @return [Array[string]] An array of strings that should be shuffled
   def self.get_all_shuffle_files
-
-    # Glob the base folders
-    base_folders = []
-    Rails.configuration.files['included_folders'].each do |folder|
-      folder = File.join(Rails.configuration.files['base_path'], folder)
-      base_folders += Dir.glob(folder)
-    end
-
     # Select the base folder for this selection
-    @@base_folder_selection
+    base_folders = self.get_all_folders
     selected_base_folder = base_folders[@@base_folder_selection]
     @@base_folder_selection = (@@base_folder_selection + 1) % base_folders.length
     Rails.logger.debug("Picking file from selected base folder #{@@base_folder_selection} #{selected_base_folder}")
