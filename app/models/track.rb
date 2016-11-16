@@ -11,7 +11,7 @@ class Track < ApplicationRecord
     working_path = share_path
 
     # This working path should be the path to add to the download base
-    URI.join(Rails.configuration.files['base_download_path'], working_path).to_s
+    URI.join(Rails.configuration.files['base_download_path'], URI.encode(working_path)).to_s
   end
 
   def folder_download_link
@@ -21,7 +21,7 @@ class Track < ApplicationRecord
     end
 
     working_path = share_path
-    URI.join(Rails.configuration.files['base_folder_download_path'], working_path).to_s
+    URI.join(Rails.configuration.files['base_folder_download_path'], URI.encode(working_path)).to_s
   end
 
   private
