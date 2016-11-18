@@ -1,5 +1,6 @@
 require 'rufus-scheduler'
 require 'active_support/time'
+require 'audioinfo'
 
 ############################################################################
 # Player Enqueue Task
@@ -47,7 +48,7 @@ Rails.application.config.after_initialize do
         track_info = AudioInfo.new(buffer_file.absolute_path)
         track.artist = track_info.artist || 'Unknown Artist'
         track.album = track_info.album || 'Unknown Album'
-        track.title = track_info.title || 'Unknown Title',
+        track.title = track_info.title || 'Unknown Title'
         track.uploader = FileSystem::get_track_uploader(buffer_file.absolute_path)
         track.length = track_info.length.round(0)
       end
