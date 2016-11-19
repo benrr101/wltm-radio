@@ -16,3 +16,17 @@
   text-shadow: #444 0 1px 1px;
   background-color: inherit;
 }
+
+.history-item {
+  h4 {
+    margin-top: 0;
+  }
+  p {
+    margin-bottom: 0;
+  }
+  a.btn {
+    margin-top: 5px;
+    margin-left: 5px;
+  }
+}
+

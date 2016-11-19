@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   # GET /index, the default route
   root :to => 'index#index'
   get 'index', to: 'index#index'
+  get 'history', to: 'index#history'
 
   namespace :api, constraints: {format: 'json'}, defaults: {format: 'json'} do
     # GET /stats/share
