@@ -13,4 +13,10 @@
 //= require jquery
 //= require knockout
 //= require bootstrap-sprockets
-//= require_tree .
+
+ko.observableArray.fn.pushAll = function(valuesToPush) {
+    var underlyingArray = this();
+    this.valueWillMutate();
+    ko.utils.arrayPushAll(underlyingArray, valuesToPush);
+    this.valueHasMutated();
+};

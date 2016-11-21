@@ -4,10 +4,10 @@ class Api::HistoryController < ApplicationController
     current_track = HistoryRecord.includes(:track).order(:played_time).last
     render :json => current_track,
            :include => {:track => {
-               :except => [:created_at, :updated_at, :id, :absolute_path],
+               :except => [:created_at, :updated_at, :absolute_path],
                :methods => [:download_link, :folder_download_link]
            }},
-           :except => [:created_at, :updated_at, :id, :track_id]
+           :except => [:created_at, :updated_at, :track_id]
   end
 
   # GET /history/date?start=?[&end=?][&page=?&pagesize=?][&desc=true]
@@ -55,9 +55,9 @@ class Api::HistoryController < ApplicationController
 
     render :json => tracks,
            :include => {:track => {
-               :except => [:created_at, :updated_at, :id, :absolute_path],
+               :except => [:created_at, :updated_at, :absolute_path],
                :methods => [:download_link, :folder_download_link]
            }},
-           :except => [:created_at, :updated_at, :id, :track_id]
+           :except => [:created_at, :updated_at, :track_id]
   end
 end

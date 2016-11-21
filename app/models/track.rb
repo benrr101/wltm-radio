@@ -9,6 +9,9 @@ class Track < ApplicationRecord
 
     # Figure out which folder this came from and remove it from the start
     working_path = share_path
+    if working_path.nil?
+      return nil
+    end
 
     # This working path should be the path to add to the download base
     URI.join(Rails.configuration.files['base_download_path'], working_path).to_s
@@ -21,6 +24,10 @@ class Track < ApplicationRecord
     end
 
     working_path = share_path
+    if working_path.nil?
+      return nil
+    end
+
     URI.join(Rails.configuration.files['base_folder_download_path'], working_path).to_s
   end
 
@@ -29,6 +36,10 @@ class Track < ApplicationRecord
     # Figure out the path of the shared folder
     base_folder = FileSystem.get_all_folders.find do |folder|
       absolute_path.start_with?(folder)
+    end
+
+    if base_folder.nil?
+      return nil
     end
 
     # Trim base folder and leading / from absolute path

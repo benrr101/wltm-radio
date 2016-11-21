@@ -22,8 +22,5 @@ Rails.application.routes.draw do
 
     # GET /history/date?start=unix&end=unix
     get 'history/date', to: 'history#date'
-
-    # GET /history/page?pagesize=?[&page=?]
-    get 'history/page', to: 'history#page'
   end
 end
