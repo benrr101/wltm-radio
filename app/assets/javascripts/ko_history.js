@@ -67,6 +67,27 @@ function formatDate(dateTime) {
     return dateObj.toLocaleTimeString() + ", " + dateObj.toLocaleDateString()
 }
 
+function formatTime(seconds) {
+    // Greedily divide the seconds starting with hours
+    var hours = Math.floor(seconds / 3600);
+    seconds %= 3600;
+    var minutes = Math.floor(seconds / 60);
+    seconds %= 60;
+
+    // Put the hours on if it's greater than 0
+    var timeString = "";
+    if(hours > 0) { timeString += hours + ":"; }
+
+    // Put on minutes and seconds regardless
+    if(minutes < 10 && hours > 0) { timeString += "0"; }
+    timeString += minutes + ":";
+
+    // Put on seconds last
+    if(seconds < 10) { timeString += "0"; }
+    timeString += seconds;
+
+    return timeString;
+}
 
 var greedyTimeDivisors = [
     {

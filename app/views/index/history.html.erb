@@ -17,7 +17,7 @@
           </h4>
           <p>
             <span class="label label-primary"><span class="glyphicon glyphicon-arrow-up"></span> <span data-bind="text: track.uploader"></span></span>
-            <span class="label label-primary"><span class="glyphicon glyphicon-time"></span> <span data-bind="text: track.length"></span></span>
+            <span class="label label-primary"><span class="glyphicon glyphicon-time"></span> <span data-bind="text: formatTime(track.length)"></span></span>
             <span class="label label-primary"><span class="glyphicon glyphicon-play"></span> <span data-bind="text: on_behalf_of"></span></span>
             <!-- <span class="label label-primary"><span class="glyphicon glyphicon-stats"></span> 16</span> -->
           </p>
@@ -82,7 +82,7 @@
             </p>
             <p>
               <span class="label label-primary"><span class="glyphicon glyphicon-arrow-up"></span> <span data-bind="text: track.uploader"></span></span>
-              <span class="label label-primary"><span class="glyphicon glyphicon-time"></span> <span data-bind="text: track.length"></span></span>
+              <span class="label label-primary"><span class="glyphicon glyphicon-time"></span> <span data-bind="text: formatTime(track.length)"></span></span>
               <span class="label label-primary"><span class="glyphicon glyphicon-play"></span> <span data-bind="text: on_behalf_of"></span></span>
               <!-- <span class="label label-primary"><span class="glyphicon glyphicon-stats"></span> 16</span> -->
             </p>
