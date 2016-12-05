@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161117083000) do
+ActiveRecord::Schema.define(version: 20161204230826) do
 
   create_table "buffer_records", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string   "absolute_path"
@@ -28,6 +28,14 @@ ActiveRecord::Schema.define(version: 20161117083000) do
     t.datetime "updated_at",   null: false
     t.integer  "track_id"
     t.index ["track_id"], name: "index_history_records_on_track_id", using: :btree
+  end
+
+  create_table "hmac_keys", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.string "public_key",  limit: 36, null: false
+    t.string "private_key", limit: 36, null: false
+    t.string "description"
+    t.index ["private_key"], name: "index_hmac_keys_on_private_key", unique: true, using: :btree
+    t.index ["public_key"], name: "index_hmac_keys_on_public_key", unique: true, using: :btree
   end
 
   create_table "tracks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
