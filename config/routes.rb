@@ -22,5 +22,8 @@ Rails.application.routes.draw do
 
     # GET /history/date?start=unix&end=unix
     get 'history/date', to: 'history#date'
+
+    # POST /skip
+    post 'skip', to: 'skip#skip'
   end
 end
