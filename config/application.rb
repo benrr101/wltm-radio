@@ -6,6 +6,10 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# For Rufus to work correctly on Windows, we need to set a timezone in the environment. Although
+# this isn't an ideal situation, I'm going to force it to UTC
+ENV['TZ'] = 'UTC'
+
 module WLTMRadioApi2
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
