@@ -117,6 +117,19 @@ require 'ruby-mpd'
       Status.new(is_running, queue_length, now_playing)
     end
 
+    # Presses the "next" button on MPD
+    def next
+      # fire up the connection
+      @mpd_connection.connect
+      begin
+        # Next!
+        @mpd_connection.next
+      ensure
+        # Make sure we always disconnect
+        @mpd_connection.disconnect
+      end
+    end
+
     # Adds a track to the play queue based on its absolute path
     # @param [string] abs_path  Absolute path to the track to add to the queue
     def queue_add(abs_path)

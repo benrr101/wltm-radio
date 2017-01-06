@@ -29,12 +29,23 @@ class Api::SkipController < ApplicationController
     # Require that a username token be provided
     on_behalf_of = params[:on_behalf_of]
     if on_behalf_of.nil?
-      render :json => {:error => 'on_behalf_of token not provided'},
+      render :json => {:error => 'on_behalf_of token not provided or content-type header not set properly'},
              :status => :bad_request
       return
     end
 
-    render :json => {:success => true},
-           :status => :accepted
+    # Add the skipper to the list of skippers
+    current_history_id = HistoryRecord.last.id
+    Skip.create(history_record_id: current_history_id, on_behalf_of: on_behalf_of)
+
+    # Get the current number of skips and the current number of listeners
+    current_listeners = IcecastStatus.get_status.current_listeners
+    current_skips = Skip.where(:history_record_id => current_history_id).count
+
+    render :json => {
+        :success => true,
+        :current_skips => current_skips,
+        :current_listeners => current_listeners
+    }, :status => :accepted
   end
 end
