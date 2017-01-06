@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161204230826) do
+ActiveRecord::Schema.define(version: 20161211000020) do
 
   create_table "buffer_records", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string   "absolute_path"
@@ -38,6 +38,14 @@ ActiveRecord::Schema.define(version: 20161204230826) do
     t.index ["public_key"], name: "index_hmac_keys_on_public_key", unique: true, using: :btree
   end
 
+  create_table "skips", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.string   "on_behalf_of"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
+    t.integer  "history_record_id"
+    t.index ["history_record_id"], name: "index_skips_on_history_record_id", using: :btree
+  end
+
   create_table "tracks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string   "absolute_path", null: false
     t.string   "artist"
@@ -51,4 +59,5 @@ ActiveRecord::Schema.define(version: 20161204230826) do
   end
 
   add_foreign_key "history_records", "tracks"
+  add_foreign_key "skips", "history_records"
 end
