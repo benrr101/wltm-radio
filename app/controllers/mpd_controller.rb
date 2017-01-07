@@ -53,10 +53,11 @@ class MpdController < ActionController::Base
     # Step 2) Enqueue the next track
     enqueue_next(0)
 
-    # Step 3) Tell MPD to skip ahead to the next one
+    # Step 3) Tell MPD to fade out the current track and skip ahead to the next one
     mpd = Mpd.new
+    mpd.fade_out
     mpd.next
-
+    mpd.volume_reset
   end
 
 end

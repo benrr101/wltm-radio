@@ -11,6 +11,9 @@ default: &default
   # If a track has been played within the last number of seconds, it will be skipped
   replay_limit: 7200
 
+  # If the percentage of listeners who want to skip is greater than this value, it will be skipped
+  skip_percentage: 50
+
 development:
   <<: *default
 
