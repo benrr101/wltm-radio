@@ -34,8 +34,16 @@ class Api::SkipController < ApplicationController
       return
     end
 
-    # Add the skipper to the list of skippers
+    # Require that the user hasn't already voted to skip
     current_history_id = HistoryRecord.last.id
+    if Skip.where(:history_record_id => current_history_id, :on_behalf_of => on_behalf_of).exists?
+      render :json => {:error => 'on_behalf_of user cannot vote to skip current track more than once'},
+             :status => :bad_request
+      return
+    end
+
+    # Add the skipper to the list of skippers
+
     Skip.create(history_record_id: current_history_id, on_behalf_of: on_behalf_of)
 
     # Get the current number of skips and the current number of listeners

@@ -27,7 +27,7 @@ Rails.application.config.after_initialize do
       shuffled_files = FileSystem.get_all_shuffle_files.shuffle
       if shuffled_files.count == 0
         Rails.logger.error('Failed to find tracks to add to buffer!')
-        return
+        next 2
       end
 
       # Select the file to add to the buffer
