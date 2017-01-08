@@ -39,7 +39,7 @@ class MpdController < ActionController::Base
 
     # Step 4) Add the history record for the track
     HistoryRecord.create(
-      on_behald_of: buffer_file.on_behalf_of,
+      on_behalf_of: buffer_file.on_behalf_of,
       bot_queued: buffer_file.bot_queued,
       played_time: DateTime.now + remaining_time.seconds,
       track_id: track_record.id
