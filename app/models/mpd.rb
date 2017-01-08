@@ -117,19 +117,6 @@ require 'ruby-mpd'
       Status.new(is_running, queue_length, now_playing)
     end
 
-    # Fades out the output volume of MPD to 0
-    def fade_out
-      @mpd_connection.connect
-      begin
-        # Reduce volume to 0
-        until @mpd_connection.volume == 0
-          @mpd_connection.volume -= 1
-        end
-      ensure
-        @mpd_connection.disconnect
-      end
-    end
-
     # Presses the "next" button on MPD
     def next
       # fire up the connection
@@ -198,17 +185,6 @@ require 'ruby-mpd'
       begin
         # force consume mode on
         return @mpd_connection.consume = true
-      ensure
-        @mpd_connection.disconnect
-      end
-    end
-
-    # Resets the output volume of MPD to 100
-    def volume_reset
-      @mpd_connection.connect
-      begin
-        # Reset the volume to 100
-        @mpd_connection.volume = 100
       ensure
         @mpd_connection.disconnect
       end
