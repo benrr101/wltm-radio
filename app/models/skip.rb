@@ -13,7 +13,7 @@ class Skip < ApplicationRecord
 
   # @return [float] Percentage of listeners who have voted to skip
   def self.current_skip_percentage
-    current_listeners = IcecastStatus.get_status.current_listeners
+    current_listeners = IcecastStatus.get_status.current_listeners.to_i
     return 0 if current_listeners == 0  # Avoid div by zero errors
 
     self.current_skip_count.to_f / current_listeners.to_f * 100
