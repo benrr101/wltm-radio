@@ -18,4 +18,9 @@ class Skip < ApplicationRecord
 
     self.current_skip_count.to_f / current_listeners.to_f * 100
   end
+
+  # @returns [int] Threshold above which the current track will be skipped
+  def self.skip_percentage_threshold
+    return Rails.configuration.queues['skip_percentage']
+  end
 end

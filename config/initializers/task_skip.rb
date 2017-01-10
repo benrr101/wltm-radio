@@ -16,7 +16,7 @@ Rails.application.config.after_initialize do
   # Setup the task to run every 5s
   s.every '5s', overlap: false do
     # If the currently playing track has over 50% vote to skip, skip it
-    if Skip.current_skip_percentage >= Rails.configuration.queues['skip_percentage']
+    if Skip.current_skip_percentage >= Skip.skip_percentage_threshold
       MpdController.skip
     end
   end

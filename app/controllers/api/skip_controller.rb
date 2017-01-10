@@ -46,14 +46,12 @@ class Api::SkipController < ApplicationController
 
     Skip.create(history_record_id: current_history_id, on_behalf_of: on_behalf_of)
 
-    # Get the current number of skips and the current number of listeners
-    current_listeners = IcecastStatus.get_status.current_listeners
-    current_skips = Skip.where(:history_record_id => current_history_id).count
-
     render :json => {
         :success => true,
-        :current_skips => current_skips,
-        :current_listeners => current_listeners
+        :current_skips => Skip.current_skip_count,
+        :current_listeners => IcecastStatus.get_status.current_listeners,
+        :current_skip_percentage => Skip.current_skip_percentage,
+        :skip_percentage_threshold => Skip.skip_percentage_threshold
     }, :status => :accepted
   end
 end
