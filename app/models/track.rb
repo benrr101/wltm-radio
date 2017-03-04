@@ -1,4 +1,5 @@
 class Track < ApplicationRecord
+  belongs_to :art
   has_many :history_record
 
   def download_link
