@@ -8,6 +8,7 @@ require 'taglib/wav'
 
 class Track < ApplicationRecord
   has_many :history_record
+  has_many :buffer_record
 
   def Track.create_from_file(file_path)
     # Based on the extension of the file, load up the appropriate taglib handler
