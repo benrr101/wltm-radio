@@ -14,15 +14,15 @@ class Track < ApplicationRecord
     # Based on the extension of the file, load up the appropriate taglib handler
     case File.extname(file_path).split('.').last
       when 'mp3', 'm4a'
-        tag_file = TagLib::MPEG::File.open(file_path)
+        tag_file = TagLib::MPEG::File.new(file_path)
       when 'flac'
-        tag_file = TagLib::FLAC::File.open(file_path)
+        tag_file = TagLib::FLAC::File.new(file_path)
       when 'ogg', 'oga'
-        tag_file = TagLib::Ogg::File.open(file_path)
+        tag_file = TagLib::Ogg::File.new(file_path)
       when 'wav'
-        tag_file = TagLib::WAV::File.open(file_path)
+        tag_file = TagLib::RIFF::WAV::File.new(file_path)
       when 'aiff', 'aif', 'aifc'
-        tag_file = TagLib::AIFF::File.open(file_path)
+        tag_file = TagLib::RIFF::AIFF::File.new(file_path)
       else
         tag_file = TagLib::FileRef.new(file_path)
     end
