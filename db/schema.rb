@@ -10,14 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161211000020) do
+ActiveRecord::Schema.define(version: 20170305213600) do
 
   create_table "buffer_records", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.string   "absolute_path"
     t.string   "on_behalf_of"
     t.boolean  "bot_queued"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+    t.integer  "track_id"
+    t.index ["track_id"], name: "index_buffer_records_on_track_id", using: :btree
   end
 
   create_table "history_records", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -58,6 +59,7 @@ ActiveRecord::Schema.define(version: 20161211000020) do
     t.index ["absolute_path"], name: "index_tracks_on_absolute_path", unique: true, using: :btree
   end
 
+  add_foreign_key "buffer_records", "tracks"
   add_foreign_key "history_records", "tracks"
   add_foreign_key "skips", "history_records"
 end

@@ -39,7 +39,7 @@ gem 'sys-filesystem'
 gem 'icecast'
 
 # Get the metadata of the track
-gem 'ruby-audioinfo'
+gem 'taglib-ruby'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
