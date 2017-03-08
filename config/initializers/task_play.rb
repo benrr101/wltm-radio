@@ -1,6 +1,5 @@
 require 'rufus-scheduler'
 require 'active_support/time'
-require 'audioinfo'
 
 ############################################################################
 # Player Enqueue Task

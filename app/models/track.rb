@@ -1,6 +1,44 @@
+require 'taglib'
+require 'taglib/id3v1'
+require 'taglib/id3v2'
+require 'taglib/flac'
+require 'taglib/aiff'
+require 'taglib/ogg'
+require 'taglib/wav'
+
 class Track < ApplicationRecord
   belongs_to :art
   has_many :history_record
+  has_many :buffer_record
+
+  def Track.create_from_file(file_path)
+    # Based on the extension of the file, load up the appropriate taglib handler
+    case File.extname(file_path).split('.').last
+      when 'mp3', 'm4a'
+        tag_file = TagLib::MPEG::File.new(file_path)
+      when 'flac'
+        tag_file = TagLib::FLAC::File.new(file_path)
+      when 'ogg', 'oga'
+        tag_file = TagLib::Ogg::File.new(file_path)
+      when 'wav'
+        tag_file = TagLib::RIFF::WAV::File.new(file_path)
+      when 'aiff', 'aif', 'aifc'
+        tag_file = TagLib::RIFF::AIFF::File.new(file_path)
+      else
+        tag_file = TagLib::FileRef.new(file_path)
+    end
+    tag = tag_file.tag
+    properties = tag_file.audio_properties
+
+    # Using the tag file, get at the information we need to create the track
+    return Track.find_or_create_by!(absolute_path: file_path) do |track|
+      track.artist = tag.artist || 'Unknown Artist'
+      track.album = tag.artist || 'Unknown Album'
+      track.title = tag.artist || 'Uknonwn Title'
+      track.uploader = FileSystem::get_track_uploader(file_path)
+      track.length = properties.length
+    end
+  end
 
   def download_link
     # Skip generating a download link if we don't have a base path

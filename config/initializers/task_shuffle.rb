@@ -1,5 +1,5 @@
 require 'rufus-scheduler'
-require 'audioinfo'
+require 'taglib'
 
 ############################################################################
 # Shuffle Enqueue Task
@@ -42,22 +42,22 @@ Rails.application.config.after_initialize do
       end
 
       # If the track is too short, add track before and after it
-      if AudioInfo.new(shuffle_pick).length <= Rails.configuration.queues['bookend_threshold']
+      if TagLib::FileRef.new(shuffle_pick).audio_properties.length <= Rails.configuration.queues['bookend_threshold']
         Rails.logger.debug("#{shuffle_pick} is too short, adding tracks before and after it")
 
         # Get all the tracks that are in the folder and sort by track number if possible
         unshuffled_files = FileSystem::get_all_folder_files(File.dirname(shuffle_pick)).sort do |x,y|
-          x_audio = AudioInfo.new(x)
-          y_audio = AudioInfo.new(y)
+          x_audio = TagLib::FileRef.new(x).tag
+          y_audio = TagLib::FileRef.new(y).tag
 
           # If either of the tracks don't have track numbers, use filenames instead
-          if x_audio.tracknum.nil? || y_audio.tracknum.nil?
+          if x_audio.track.nil? || y_audio.track.nil?
             next x <=> y
           end
 
           # TODO Add support for disc number comparison once taglib is working
           # Sort by the track number
-          next x_audio.tracknum <=> y_audio.tracknum
+          next x_audio.track <=> y_audio.track
         end
 
 

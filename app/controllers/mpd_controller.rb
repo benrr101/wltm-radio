@@ -1,4 +1,3 @@
-require 'audioinfo'
 require 'active_support/time'
 
 class MpdController < ActionController::Base
@@ -25,17 +24,7 @@ class MpdController < ActionController::Base
     end
 
     # Step 3) Add the record to the track table if it isn't already in there
-    # TODO: Move this to a method in the Track model
-    track_record = Track.find_or_create_by!(absolute_path: buffer_file.absolute_path) do |track|
-      # Pull the information about the track out of the file
-      # TODO: Replace this with taglib when I figure out how to run it on windows
-      track_info = AudioInfo.new(buffer_file.absolute_path)
-      track.artist = track_info.artist || 'Unknown Artist'
-      track.album = track_info.album || 'Unknown Album'
-      track.title = track_info.title || 'Unknown Title'
-      track.uploader = FileSystem::get_track_uploader(buffer_file.absolute_path)
-      track.length = track_info.length.round(0)
-    end
+    track_record = Track.create_from_file(buffer_file.absolute_path)
 
     # Step 4) Add the history record for the track
     HistoryRecord.create(
