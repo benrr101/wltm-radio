@@ -10,7 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170305213600) do
+ActiveRecord::Schema.define(version: 20170307222500) do
+
+  create_table "arts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.string   "hash_code",  limit: 64,    null: false
+    t.string   "mimetype",   limit: 128,   null: false
+    t.binary   "bytes",      limit: 65535, null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["hash_code"], name: "index_arts_on_hash_code", unique: true, using: :btree
+  end
 
   create_table "buffer_records", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string   "on_behalf_of"
@@ -56,10 +65,13 @@ ActiveRecord::Schema.define(version: 20170305213600) do
     t.integer  "length"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "art_id"
     t.index ["absolute_path"], name: "index_tracks_on_absolute_path", unique: true, using: :btree
+    t.index ["art_id"], name: "index_tracks_on_art_id", using: :btree
   end
 
   add_foreign_key "buffer_records", "tracks"
   add_foreign_key "history_records", "tracks"
   add_foreign_key "skips", "history_records"
+  add_foreign_key "tracks", "arts"
 end

@@ -24,6 +24,14 @@ default: &default
     - wma
     - ape
 
+  # Only allowed image extensions are used for images
+  allowed_image_extensions:
+    - jpg
+    - jpeg
+    - bmp
+    - png
+    - gif
+
   # Optional, if you want to enable downloading files via WebDAV, base path to WebDAV download service
   download_base_path: http://path/to/download/base
 
