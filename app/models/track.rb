@@ -7,6 +7,7 @@ require 'taglib/ogg'
 require 'taglib/wav'
 
 class Track < ApplicationRecord
+  belongs_to :art
   has_many :history_record
   has_many :buffer_record
 

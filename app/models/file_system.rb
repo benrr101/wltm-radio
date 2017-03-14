@@ -92,7 +92,7 @@ class FileSystem
 
   # Fetches a list of all tracks that are in a given folder
   # @param folder [string]  The absolute path of the folder to get all tracks from
-  # @returns [Array[string]] An arry of all files in the folder
+  # @return [Array[string]] An arry of all files in the folder
   def self.get_all_folder_files(folder)
     # Generate files that are in the folder
     files = []
@@ -102,6 +102,41 @@ class FileSystem
     end
 
     return files
+  end
+
+  # Fetches a list of all images in the folder of a given audio file
+  # @param folder [string]  The absolute path of the audio file to get images from
+  # @return [Array[string]]  An array of all images files in the folder that contains the audio
+  def self.get_all_image_files(audio_path)
+    # Figure out which folder the audio is in
+    folder = File.dirname(audio_path)
+
+    # Generate files that are in the folder
+    files = []
+    Rails.configuration.files['allowed_image_extensions'].each do |allowed_extension|
+      glob = File.join(folder, "*.#{allowed_extension}")
+      files += Dir.glob(glob)
+    end
+
+    return files
+  end
+
+  # Attempts to determine the mimetype of the given image based on extension
+  # @param image_path [string] Absolute path to the audio file
+  # @return [string] The mimetype based on the file's extension
+  def self.get_image_mimetype(image_path)
+    case File.extname(image_path).split('.').last
+      when 'png'
+        return 'image/png'
+      when 'jpg', 'jpeg'
+        return 'image/jpeg'
+      when 'bmp'
+        return 'image/bmp'
+      when 'gif'
+        return 'image/gif'
+      else
+        return 'application/octet-stream'
+    end
   end
 
   # Calculates the uploader of the track

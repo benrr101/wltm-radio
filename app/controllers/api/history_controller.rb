@@ -1,13 +1,29 @@
 class Api::HistoryController < ApplicationController
   # GET /history/current
   def current
-    current_track = HistoryRecord.includes(:track).order(:played_time).last
-    render :json => current_track,
-           :include => {:track => {
-               :except => [:created_at, :updated_at, :absolute_path],
-               :methods => [:download_link, :folder_download_link]
-           }},
-           :except => [:created_at, :updated_at, :track_id]
+    current_track = HistoryRecord.order(:played_time).last.serializable_hash(
+        :include => {
+            :track => {
+              :include => {
+                  :art => {
+                    :except => [:created_at, :updated_at, :hash_code, :id, :bytes],
+                    :methods => [:art_link]
+                  }
+              },
+              :except => [:created_at, :updated_at, :absolute_path, :art_id],
+              :methods => [:download_link, :folder_download_link]
+            }
+        },
+        :except => [:track_id, :created_at, :updated_at]
+    )
+
+    mpd_stats = Mpd.new.get_status
+    time_stats = mpd_stats.current_track.nil? ? nil : mpd_stats.current_track.time_stats
+
+    render :json => {
+        :current_track => current_track,
+        :time_stats =>  time_stats
+    }
   end
 
   # GET /history/date?start=?[&end=?][&page=?&pagesize=?][&desc=true]
