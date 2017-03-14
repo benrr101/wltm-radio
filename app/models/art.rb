@@ -63,4 +63,8 @@ class Art < ApplicationRecord
     end
   end
 
+  def art_link
+    "/api/art/#{hash_code}"
+  end
+
 end
