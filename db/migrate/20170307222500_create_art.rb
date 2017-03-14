@@ -19,8 +19,10 @@ class CreateArt < ActiveRecord::Migration
     Track.all.each do |track|
       begin
         art = Art.create_from_file(track.absolute_path)
-        track.update_attribute(:art_id, art.id)
-        say("Found artwork for #{track.absolute_path}")
+        unless art.nil?
+          track.update_attribute(:art_id, art.id)
+          say("Found artwork for #{track.absolute_path}", :subitem)
+        end
       rescue
         say("Failed to find artwork for #{track.absolute_path}", :subitem)
       end

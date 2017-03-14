@@ -16,12 +16,14 @@ class Art < ApplicationRecord
     bytes = nil
     case File.extname(path).split('.').last
       when 'mp3', 'm4a'
-        id3v2_tag = TagLib::MPEG::File.new(path).id3v2_tag
+        id3v2_file = TagLib::MPEG::File.new(path)
+        id3v2_tag = id3v2_file.id3v2_tag
         if id3v2_tag.frame_list('APIC').any?
           pic = id3v2_tag.frame_list('APIC').first
           mimetype = pic.mime_type
           bytes = pic.picture
         end
+        id3v2_file.close
       when 'flac'
         tag_file = TagLib::FLAC::File.new(path)
         unless tag_file.picture_list[0].nil?
@@ -29,6 +31,7 @@ class Art < ApplicationRecord
           mimetype = pic.mime_type
           bytes = pic.data
         end
+        tag_file.close
       else
         mimetype = nil
         bytes = nil
@@ -54,12 +57,13 @@ class Art < ApplicationRecord
 
     # Step 3: Store the image in the database
     begin
-      Art.find_or_create_by!(hash_code: hash) do |art|
+      return Art.find_or_create_by!(hash_code: hash) do |art|
         art.mimetype = mimetype
         art.bytes = bytes
       end
     rescue e
       puts e
+      return nil
     end
   end
 
