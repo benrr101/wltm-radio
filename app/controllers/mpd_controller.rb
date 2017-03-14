@@ -6,7 +6,7 @@ class MpdController < ActionController::Base
     mpd = Mpd.new
 
     # Step 1) Get next track from the buffer
-    buffer_file = BufferRecord.first
+    buffer_file = BufferRecord.includes(:track).first
     if buffer_file.nil?
       Rails.logger.error('Buffer is empty! Cannot add to mpd queue! Consider increasing size of buffer to prevent mpd starvation')
       return
@@ -15,16 +15,16 @@ class MpdController < ActionController::Base
 
     # Step 2) Add the track to MPD's queue
     begin
-      Rails.logger.info("Adding to MPD playlist: #{File.basename(buffer_file.absolute_path)}")
+      Rails.logger.info("Adding to MPD playlist: #{File.basename(buffer_file.track.absolute_path)}")
       file_uri = "file:///#{buffer_file.absolute_path}"
       mpd.queue_add(file_uri)
     rescue Exception => e
-      Rails.logger.error("Failed to add '#{File.basename(buffer_file.absolute_path)}' to MPD: #{e.message}")
+      Rails.logger.error("Failed to add '#{File.basename(buffer_file.track.absolute_path)}' to MPD: #{e.message}")
       return
     end
 
     # Step 3) Add the record to the track table if it isn't already in there
-    track_record = Track.create_from_file(buffer_file.absolute_path)
+    track_record = Track.create_from_file(buffer_file.track.absolute_path)
 
     # Step 4) Add the history record for the track
     HistoryRecord.create(

@@ -72,8 +72,9 @@ Rails.application.config.after_initialize do
       # Add all the tracks to the buffer
       Rails.logger.info("Adding #{files_to_add.length} track to buffer: #{files_to_add.map {|file| File.basename(file)}.join(', ')}")
       files_to_add.each do |file|
+        track = Track.create_from_file(file)
         BufferRecord.create(
-          absolute_path: file,
+          track_id: track.id,
           on_behalf_of: 'shuffle',
           bot_queued: true
         )
