@@ -12,31 +12,46 @@ class Track < ApplicationRecord
   has_many :buffer_record
 
   def Track.create_from_file(file_path)
-    # Based on the extension of the file, load up the appropriate taglib handler
-    case File.extname(file_path).split('.').last
-      when 'mp3', 'm4a'
-        tag_file = TagLib::MPEG::File.new(file_path)
-      when 'flac'
-        tag_file = TagLib::FLAC::File.new(file_path)
-      when 'ogg', 'oga'
-        tag_file = TagLib::Ogg::File.new(file_path)
-      when 'wav'
-        tag_file = TagLib::RIFF::WAV::File.new(file_path)
-      when 'aiff', 'aif', 'aifc'
-        tag_file = TagLib::RIFF::AIFF::File.new(file_path)
-      else
-        tag_file = TagLib::FileRef.new(file_path)
+    unless File.exists?(file_path)
+      Rails.logger.warn("Failed to create track record: File does not exist #{file_path}")
+      return nil
     end
-    tag = tag_file.tag
-    properties = tag_file.audio_properties
 
-    # Using the tag file, get at the information we need to create the track
-    return Track.find_or_create_by!(absolute_path: file_path) do |track|
-      track.artist = tag.artist || 'Unknown Artist'
-      track.album = tag.artist || 'Unknown Album'
-      track.title = tag.artist || 'Uknonwn Title'
-      track.uploader = FileSystem::get_track_uploader(file_path)
-      track.length = properties.length
+    begin
+      # Based on the extension of the file, load up the appropriate taglib handler
+      case File.extname(file_path).split('.').last
+        when 'mp3', 'm4a'
+          tag_file = TagLib::MPEG::File.new(file_path)
+        when 'flac'
+          tag_file = TagLib::FLAC::File.new(file_path)
+        when 'ogg', 'oga'
+          tag_file = TagLib::Ogg::File.new(file_path)
+        when 'wav'
+          tag_file = TagLib::RIFF::WAV::File.new(file_path)
+        when 'aiff', 'aif', 'aifc'
+          tag_file = TagLib::RIFF::AIFF::File.new(file_path)
+        else
+          tag_file = TagLib::FileRef.new(file_path)
+      end
+      tag = tag_file.tag
+      properties = tag_file.audio_properties
+
+      # Attempt to get the art for the file
+      art_id = Art.create_from_file(file_path).id || nil
+
+      # Using the tag file, get at the information we need to create the track
+      track = Track.find_or_create_by!(absolute_path: file_path) do |track|
+        track.artist = tag.artist || 'Unknown Artist'
+        track.album = tag.artist || 'Unknown Album'
+        track.title = tag.artist || 'Uknonwn Title'
+        track.uploader = FileSystem::get_track_uploader(file_path)
+        track.length = properties.length
+        track.art_id = art_id
+      end
+      Rails.logger.info("Adding new track '#{artist}' - '#{album}' - '#{title}' from #{uploader}")
+    rescue => e
+      Rails.logger.warn("Failed to read track metadata #{file_path}: #{e}")
+      return nil
     end
   end
 

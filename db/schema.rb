@@ -13,9 +13,9 @@
 ActiveRecord::Schema.define(version: 20170307222500) do
 
   create_table "arts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.string   "hash_code",  limit: 64,    null: false
-    t.string   "mimetype",   limit: 128,   null: false
-    t.binary   "bytes",      limit: 65535, null: false
+    t.string   "hash_code",  limit: 64,       null: false
+    t.string   "mimetype",   limit: 128,      null: false
+    t.binary   "bytes",      limit: 16777215, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["hash_code"], name: "index_arts_on_hash_code", unique: true, using: :btree

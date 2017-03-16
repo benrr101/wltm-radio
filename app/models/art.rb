@@ -10,6 +10,11 @@ class Art < ApplicationRecord
   has_many :track
 
   def self.create_from_file(path)
+    unless File.exists?(path)
+      Rails.logger.warn("Failed to create art record: File does not exist #{path}")
+      return nil
+    end
+
     # Step 1: Get the image file to store
     # Attempt 1: Load the art from the metadata
     mimetype = nil
@@ -61,8 +66,8 @@ class Art < ApplicationRecord
         art.mimetype = mimetype
         art.bytes = bytes
       end
-    rescue e
-      puts e
+    rescue => e
+      Rails.logger.warn("Failed to create/find Art. #{e}")
       return nil
     end
   end

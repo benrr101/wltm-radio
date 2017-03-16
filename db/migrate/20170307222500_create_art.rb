@@ -4,7 +4,7 @@ class CreateArt < ActiveRecord::Migration
     create_table :arts do |table|
       table.string  :hash_code, :null => false, limit: 64
       table.string  :mimetype, :null => false, limit: 128
-      table.binary  :bytes, :null => false
+      table.binary  :bytes, :null => false, limit: 10.megabyte
 
       table.timestamps
     end
@@ -20,11 +20,11 @@ class CreateArt < ActiveRecord::Migration
       begin
         art = Art.create_from_file(track.absolute_path)
         unless art.nil?
-          track.update_attribute(:art_id, art.id)
+          track.update_attributes(:art_id => art.id)
           say("Found artwork for #{track.absolute_path}", :subitem)
         end
-      rescue
-        say("Failed to find artwork for #{track.absolute_path}", :subitem)
+      rescue => e
+        say("Failed to find artwork for #{track.absolute_path} #{e}", :subitem)
       end
     end
   end

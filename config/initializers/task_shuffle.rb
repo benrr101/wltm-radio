@@ -73,6 +73,9 @@ Rails.application.config.after_initialize do
       Rails.logger.info("Adding #{files_to_add.length} track to buffer: #{files_to_add.map {|file| File.basename(file)}.join(', ')}")
       files_to_add.each do |file|
         track = Track.create_from_file(file)
+        if track.nil?
+          next
+        end
         BufferRecord.create(
           track_id: track.id,
           on_behalf_of: 'shuffle',

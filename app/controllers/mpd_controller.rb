@@ -6,7 +6,7 @@ class MpdController < ActionController::Base
     mpd = Mpd.new
 
     # Step 1) Get next track from the buffer
-    buffer_file = BufferRecord.includes(:track).first
+    buffer_file = BufferRecord.joins(:track).first
     if buffer_file.nil?
       Rails.logger.error('Buffer is empty! Cannot add to mpd queue! Consider increasing size of buffer to prevent mpd starvation')
       return
