@@ -30,7 +30,8 @@ class CreateArt < ActiveRecord::Migration
           say("Found artwork for #{track.absolute_path}", :subitem)
         end
       rescue => e
-        say("Failed to find artwork for #{track.absolute_path} #{e}", :subitem)
+        say("Failed to find artwork for #{track.absolute_path} #{e.message}", :subitem)
+        say("... #{e.backtrace}", :subitem)
       end
     end
   end
