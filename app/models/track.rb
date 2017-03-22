@@ -38,7 +38,7 @@ class Track < ApplicationRecord
       tag_file.close
 
       # Attempt to get the art for the file
-      art_id = Art.create_from_file(file_path).id || nil
+      #art_id = Art.create_from_file(file_path).id || nil
 
       # Using the tag file, get at the information we need to create the track
       track = Track.find_or_create_by!(absolute_path: file_path) do |track|
@@ -47,7 +47,7 @@ class Track < ApplicationRecord
         track.title = tag.artist || 'Uknonwn Title'
         track.uploader = FileSystem::get_track_uploader(file_path)
         track.length = properties.length
-        track.art_id = art_id
+        #track.art_id = art_id
       end
       Rails.logger.info("Adding new track '#{artist}' - '#{album}' - '#{title}' from #{uploader}")
     rescue => e

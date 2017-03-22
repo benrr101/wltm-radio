@@ -45,7 +45,7 @@ class Art < ApplicationRecord
     # Attempt 2: Find any image files in the folder
     if mimetype.nil?
       image_files = FileSystem.get_all_image_files(path)
-      if image_files.any?
+      if not(image_files.nil?) and image_files.any?
         image_file = image_files[0]
         mimetype = FileSystem.get_image_mimetype(image_file)
         bytes = open(image_file, 'rb') { |file| file.read }
@@ -62,7 +62,7 @@ class Art < ApplicationRecord
 
     # Step 3: Store the image in the database
     begin
-      return Art.find_or_create_by!(hash_code: hash) do |art|
+      return Art.where(:hash_code => hash).first_or_create! do |art|
         art.mimetype = mimetype
         art.bytes = bytes
       end
