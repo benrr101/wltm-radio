@@ -8,8 +8,8 @@ require 'taglib/wav'
 
 class Track < ApplicationRecord
   belongs_to :art
-  has_many :history_record
-  has_many :buffer_record
+  has_many :history_record, dependent: :destroy
+  has_many :buffer_record, dependent: :destroy
 
   def Track.create_from_file(file_path)
     unless File.exists?(file_path)
@@ -50,6 +50,7 @@ class Track < ApplicationRecord
         #track.art_id = art_id
       end
       Rails.logger.info("Adding new track '#{artist}' - '#{album}' - '#{title}' from #{uploader}")
+      return track
     rescue => e
       Rails.logger.warn("Failed to read track metadata #{file_path}: #{e}")
       return nil
