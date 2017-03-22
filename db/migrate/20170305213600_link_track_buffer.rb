@@ -11,8 +11,8 @@ class LinkTrackBuffer < ActiveRecord::Migration
       begin
         track = Track.create_from_file(record.absolute_path)
         record.update_attribute(:track_id, track.id)
-      rescue
-        say("Failed to update #{record.absolute_path}!", :subitem)
+      rescue => e
+        say("Failed to update #{record.absolute_path}: #{e.message}", :subitem)
         record.destroy
       end
     end
