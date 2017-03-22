@@ -35,6 +35,7 @@ class Track < ApplicationRecord
       end
       tag = tag_file.tag
       properties = tag_file.audio_properties
+      tag_file.close
 
       # Attempt to get the art for the file
       art_id = Art.create_from_file(file_path).id || nil
