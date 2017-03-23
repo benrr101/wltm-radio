@@ -19,37 +19,47 @@ class Track < ApplicationRecord
 
     begin
       # Based on the extension of the file, load up the appropriate taglib handler
+      tag_props = nil
       case File.extname(file_path).split('.').last
         when 'mp3', 'm4a'
-          tag_file = TagLib::MPEG::File.new(file_path)
+          TagLib::MPEG::File.open(file_path) do |file|
+            tag_props = {:tag => file.tag, :props => file.audio_properties}
+          end
         when 'flac'
-          tag_file = TagLib::FLAC::File.new(file_path)
+          TagLib::FLAC::File.open(file_path) do |file|
+            tag_props = {:tag => file.tag, :props => file.audio_properties}
+          end
         when 'ogg', 'oga'
-          tag_file = TagLib::Ogg::File.new(file_path)
+          TagLib::Ogg::File.open(file_path) do |file|
+            tag_props = {:tag => file.tag, :props => file.audio_properties}
+          end
         when 'wav'
-          tag_file = TagLib::RIFF::WAV::File.new(file_path)
+          TagLib::RIFF::WAV::File.open(file_path) do |file|
+            tag_props = {:tag => file.tag, :props => file.audio_properties}
+          end
         when 'aiff', 'aif', 'aifc'
-          tag_file = TagLib::RIFF::AIFF::File.new(file_path)
+          TagLib::RIFF::AIFF::File.open(file_path) do |file|
+            tag_props = {:tag => file.tag, :props => file.audio_properties}
+          end
         else
-          tag_file = TagLib::FileRef.new(file_path)
+          TagLib::FileRef.open(file_path) do |file|
+            tag_props = {:tag => file.tag, :props => file.audio_properties}
+          end
       end
-      tag = tag_file.tag
-      properties = tag_file.audio_properties
-      tag_file.close
 
       # Attempt to get the art for the file
       #art_id = Art.create_from_file(file_path).id || nil
 
       # Using the tag file, get at the information we need to create the track
       track = Track.find_or_create_by!(absolute_path: file_path) do |track|
-        track.artist = tag.artist || 'Unknown Artist'
-        track.album = tag.artist || 'Unknown Album'
-        track.title = tag.artist || 'Uknonwn Title'
+        track.artist = tag_props.nil? ? 'Unknown Artist' : tag_props[:tag].artist
+        track.album = tag_props.nil? ? 'Unknown Album' : tag_props[:tag].album
+        track.title = tag_props.nil? ? 'Uknonwn Title' : tag_props[:tag].title
         track.uploader = FileSystem::get_track_uploader(file_path)
-        track.length = properties.length
+        track.length = tag_props.nil? ? 0 : tag_props[:properties].length
         #track.art_id = art_id
       end
-      Rails.logger.info("Adding new track '#{artist}' - '#{album}' - '#{title}' from #{uploader}")
+      Rails.logger.info("Adding new track #{file_path} from #{uploader}")
       return track
     rescue => e
       Rails.logger.warn("Failed to read track metadata #{file_path}: #{e}")

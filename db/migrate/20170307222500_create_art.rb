@@ -16,7 +16,7 @@ class CreateArt < ActiveRecord::Migration
     add_foreign_key :tracks, :arts
 
     # Iterate over the tracks and store the art for each track
-    Track.find_each(batch_size: 100) do |track|
+    Track.find_each(batch_size: 20) do |track|
       unless File.exists?(track.absolute_path)
         say("Pruning #{track.absolute_path}", :subitem)
         track.destroy
