@@ -38,20 +38,38 @@ Rails.application.config.after_initialize do
       history_time = DateTime.now - Rails.configuration.queues['replay_limit'].seconds
       if HistoryRecord.joins(:track).where(tracks: {absolute_path: shuffle_pick}).where(HistoryRecord.arel_table[:played_time].gt(history_time)).any?
         Rails.logger.info("#{shuffle_pick} was played after #{history_time}, it will be skipped")
-        continue
+        next
       end
 
       # If the track is too short, add track before and after it
-      if TagLib::FileRef.new(shuffle_pick).audio_properties.length <= Rails.configuration.queues['bookend_threshold']
+      length = 0
+      begin
+        TagLib::FileRef.open(shuffle_pick) do |track|
+          length = track.audio_properties.length
+        end
+      rescue => e
+        Rails.logger.warn("Failed to read metadata for #{shuffle_pick} while shuffling, skipping: #{e}")
+        next
+      end
+      if length <= Rails.configuration.queues['bookend_threshold']
         Rails.logger.debug("#{shuffle_pick} is too short, adding tracks before and after it")
 
         # Get all the tracks that are in the folder and sort by track number if possible
         unshuffled_files = FileSystem::get_all_folder_files(File.dirname(shuffle_pick)).sort do |x,y|
-          x_audio = TagLib::FileRef.new(x).tag
-          y_audio = TagLib::FileRef.new(y).tag
+          # Get audio info for track x
+          x_track = 0
+          TagLib::FileRef.open(x) do |x_file|
+            x_track = x_file.tag.track
+          end
+
+          # Get audio info for track y
+          y_track = 0
+          TagLib::FileRef.open(y) do |y_file|
+            y_track = y_file.tag.track
+          end
 
           # If either of the tracks don't have track numbers, use filenames instead
-          if x_audio.track.nil? || y_audio.track.nil?
+          if x_track.nil? || y_track.nil?
             next x <=> y
           end
 
@@ -82,8 +100,6 @@ Rails.application.config.after_initialize do
           bot_queued: true
         )
       end
-
-      buffer_count = BufferRecord.count
     end
   end
 end

@@ -54,7 +54,7 @@ class Track < ApplicationRecord
       track = Track.find_or_create_by!(absolute_path: file_path) do |track|
         track.artist = tag_props.nil? ? 'Unknown Artist' : tag_props[:tag].artist
         track.album = tag_props.nil? ? 'Unknown Album' : tag_props[:tag].album
-        track.title = tag_props.nil? ? 'Uknonwn Title' : tag_props[:tag].title
+        track.title = tag_props.nil? ? 'Unknown Title' : tag_props[:tag].title
         track.uploader = FileSystem::get_track_uploader(file_path)
         track.length = tag_props.nil? ? 0 : tag_props[:properties].length
         #track.art_id = art_id
