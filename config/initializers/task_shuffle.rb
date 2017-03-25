@@ -19,9 +19,8 @@ Rails.application.config.after_initialize do
 
   # Setup the task to run every 10s
   s.every '10s', overlap: false do
-    # If there are less than 10 files in the buffer, add to to the buffer until its full
-    buffer_count = BufferRecord.count
-    until buffer_count > Rails.configuration.queues['buffer_max_tracks']
+    # If there are less than the configured number of files in the buffer, add to to the buffer until its full
+    until BufferRecord.count >= Rails.configuration.queues['buffer_max_tracks']
 
       # Get all the eligible files, shuffle, and pick one
       shuffled_files = FileSystem.get_all_shuffle_files.shuffle
@@ -101,5 +100,6 @@ Rails.application.config.after_initialize do
         )
       end
     end
+    Rails.logger.debug("Buffer has reached maximum configured size (#{Rails.configuration.queues['buffer_max_tracks']})")
   end
 end

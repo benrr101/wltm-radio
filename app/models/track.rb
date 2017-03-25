@@ -7,7 +7,7 @@ require 'taglib/ogg'
 require 'taglib/wav'
 
 class Track < ApplicationRecord
-  belongs_to :art
+  belongs_to :art, optional: true
   has_many :history_record, dependent: :destroy
   has_many :buffer_record, dependent: :destroy
 
@@ -19,48 +19,40 @@ class Track < ApplicationRecord
 
     begin
       # Based on the extension of the file, load up the appropriate taglib handler
-      tag_props = nil
+      reader_method = nil
       case File.extname(file_path).split('.').last
         when 'mp3', 'm4a'
-          TagLib::MPEG::File.open(file_path) do |file|
-            tag_props = {:tag => file.tag, :props => file.audio_properties}
-          end
+          reader_method = TagLib::MPEG::File.method(:open)
         when 'flac'
-          TagLib::FLAC::File.open(file_path) do |file|
-            tag_props = {:tag => file.tag, :props => file.audio_properties}
-          end
+          reader_method = TagLib::FLAC::File.method(:open)
         when 'ogg', 'oga'
-          TagLib::Ogg::File.open(file_path) do |file|
-            tag_props = {:tag => file.tag, :props => file.audio_properties}
-          end
+          reader_method = TagLib::Ogg::File.method(:open)
         when 'wav'
-          TagLib::RIFF::WAV::File.open(file_path) do |file|
-            tag_props = {:tag => file.tag, :props => file.audio_properties}
-          end
+          reader_method = TagLib::RIFF::WAV::file.method(:open)
         when 'aiff', 'aif', 'aifc'
-          TagLib::RIFF::AIFF::File.open(file_path) do |file|
-            tag_props = {:tag => file.tag, :props => file.audio_properties}
-          end
+          reader_method = TagLib::RIFF::AIFF::File.method(:open)
         else
-          TagLib::FileRef.open(file_path) do |file|
-            tag_props = {:tag => file.tag, :props => file.audio_properties}
-          end
+          reader_method = TagLib::FileRef.method(:open)
       end
 
       # Attempt to get the art for the file
       #art_id = Art.create_from_file(file_path).id || nil
 
       # Using the tag file, get at the information we need to create the track
-      track = Track.find_or_create_by!(absolute_path: file_path) do |track|
-        track.artist = tag_props.nil? ? 'Unknown Artist' : tag_props[:tag].artist
-        track.album = tag_props.nil? ? 'Unknown Album' : tag_props[:tag].album
-        track.title = tag_props.nil? ? 'Unknown Title' : tag_props[:tag].title
-        track.uploader = FileSystem::get_track_uploader(file_path)
-        track.length = tag_props.nil? ? 0 : tag_props[:properties].length
-        #track.art_id = art_id
+      return Track.find_or_create_by!(absolute_path: file_path) do |track_obj|
+        uploader = FileSystem::get_track_uploader(file_path)
+
+        Rails.logger.info("Adding new track #{file_path} from #{uploader}")
+        reader_method.call(file_path) do |tag_obj|
+          track_obj.artist = tag_obj.tag.nil? ? 'Unknown Artist' : tag_obj.tag.artist
+          track_obj.album = tag_obj.tag.nil? ? 'Unknown Album' : tag_obj.tag.album
+          track_obj.title = tag_obj.tag.nil? ? 'Unknown Title' : tag_obj.tag.title
+          track_obj.uploader = uploader
+          track_obj.length = tag_obj.audio_properties.nil? ? 0 : tag_obj.audio_properties.length
+          track_obj.art_id = nil
+          #track.art_id = art_id
+        end
       end
-      Rails.logger.info("Adding new track #{file_path} from #{uploader}")
-      return track
     rescue => e
       Rails.logger.warn("Failed to read track metadata #{file_path}: #{e}")
       return nil
