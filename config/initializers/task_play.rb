@@ -21,8 +21,8 @@ Rails.application.config.after_initialize do
     # If there is less than one track in the queue or if the remaining time is less than
     # 10 seconds, add another one from the buffer
     mpd = Mpd.new
-    remaining_time = mpd.remaining_time
-    if mpd.queue_length < 2 && (remaining_time.nil? || remaining_time <= 10)
+    remaining_time = mpd.remaining_time || 0
+    if mpd.queue_length < 2 && remaining_time <= 10
       MpdController.enqueue_next(remaining_time)
     else
       Rails.logger.debug("Current track has #{remaining_time}s left and #{mpd.queue_length} track in queue, no tracks will be added to queue")
