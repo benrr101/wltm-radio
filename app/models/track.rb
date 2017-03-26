@@ -35,9 +35,6 @@ class Track < ApplicationRecord
           reader_method = TagLib::FileRef.method(:open)
       end
 
-      # Attempt to get the art for the file
-      #art_id = Art.create_from_file(file_path).id || nil
-
       # Using the tag file, get at the information we need to create the track
       return Track.find_or_create_by!(absolute_path: file_path) do |track_obj|
         uploader = FileSystem::get_track_uploader(file_path)
@@ -49,8 +46,7 @@ class Track < ApplicationRecord
           track_obj.title = tag_obj.tag.nil? ? 'Unknown Title' : tag_obj.tag.title
           track_obj.uploader = uploader
           track_obj.length = tag_obj.audio_properties.nil? ? 0 : tag_obj.audio_properties.length
-          track_obj.art_id = nil
-          #track.art_id = art_id
+          track_obj.art_id = Art.create_from_file(file_path).id || nil
         end
       end
     rescue => e

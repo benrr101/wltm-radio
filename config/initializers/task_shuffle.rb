@@ -74,7 +74,7 @@ Rails.application.config.after_initialize do
 
           # TODO Add support for disc number comparison once taglib is working
           # Sort by the track number
-          next x_audio.track <=> y_audio.track
+          next x_track <=> y_track
         end
 
 
