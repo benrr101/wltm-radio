@@ -25,5 +25,8 @@ Rails.application.routes.draw do
 
     # POST /skip
     post 'skip', to: 'skip#skip'
+
+    # GET /art/:hash, to: 'art#hash'
+    get 'art/:hash', to: 'art#hash'
   end
 end

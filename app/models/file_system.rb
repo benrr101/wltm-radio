@@ -49,6 +49,11 @@ class FileSystem
 
   # CLASS METHODS ##########################################################
 
+  # A mimetype to default to if everything fails
+  def self.default_mimetype
+    return 'application/octet-stream'
+  end
+
   # Retrieve statistics about free space
   # @return [FileSystem::Stats] Statistics about the space used on the base path
   def self.get_status
@@ -125,17 +130,24 @@ class FileSystem
   # @param image_path [string] Absolute path to the audio file
   # @return [string] The mimetype based on the file's extension
   def self.get_image_mimetype(image_path)
-    case File.extname(image_path).split('.').last
-      when 'png'
+    return self.get_extension_mimetype(File.extname(image_path).split('.').last)
+  end
+
+  # Attempts to determine the mimetype based on the extension provided
+  # @param extension [string] The string for the extension to determine the mimetype of
+  # @return [string] The mimetype based on the extension
+  def self.get_extension_mimetype(extension)
+    case extension
+      when 'png', 'PNG'
         return 'image/png'
-      when 'jpg', 'jpeg'
+      when 'jpg', 'JPG', 'jpeg', 'JPEG'
         return 'image/jpeg'
-      when 'bmp'
+      when 'bmp', 'BMP'
         return 'image/bmp'
-      when 'gif'
+      when 'gif', 'GIF'
         return 'image/gif'
       else
-        return 'application/octet-stream'
+        return self.default_mimetype
     end
   end
 

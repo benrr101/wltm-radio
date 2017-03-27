@@ -60,6 +60,14 @@ class Art < ApplicationRecord
     # Step 2: Calculate the hash of the image bytes
     hash = Digest::SHA256.hexdigest(bytes)
 
+    # Step 3: If the mimetype we discovered isn't a mimetype, try again
+    unless mimetype.include?('/')
+      mimetype = FileSystem.get_extension_mimetype(mimetype)
+    end
+    if mimetype.include?('(null)')
+      mimetype = FileSystem.default_mimetype
+    end
+
     # Step 3: Store the image in the database
     begin
       return Art.where(:hash_code => hash).first_or_create! do |art|
