@@ -11,3 +11,4 @@ class CleanArtMimetypes < ActiveRecord::Migration
     end
   end
 end
+
