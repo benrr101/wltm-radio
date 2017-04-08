@@ -86,13 +86,8 @@ class FileSystem
     Rails.logger.debug("Picking file from selected base folder #{@@base_folder_selection} #{selected_base_folder}")
 
     # Generate globs for the different filetypes
-    files_to_shuffle = []
-    Rails.configuration.files['allowed_extensions'].each do |allowed_extension|
-      glob = File.join(selected_base_folder, "**/*.#{allowed_extension}")
-      files_to_shuffle += Dir.glob(glob)
-    end
-
-    return files_to_shuffle
+    glob = File.join(selected_base_folder, "**/*.#{self.audio_filetype_glob}")
+    return Dir.glob(glob)
   end
 
   # Fetches a list of all tracks that are in a given folder
@@ -100,13 +95,8 @@ class FileSystem
   # @return [Array[string]] An arry of all files in the folder
   def self.get_all_folder_files(folder)
     # Generate files that are in the folder
-    files = []
-    Rails.configuration.files['allowed_extensions'].each do |allowed_extension|
-      glob = File.join(folder, "*.#{allowed_extension}")
-      files += Dir.glob(glob)
-    end
-
-    return files
+    glob = File.join(folder, "*.#{self.audio_filetype_glob}")
+    return Dir.glob(glob)
   end
 
   # Fetches a list of all images in the folder of a given audio file
@@ -117,13 +107,8 @@ class FileSystem
     folder = File.dirname(audio_path)
 
     # Generate files that are in the folder
-    files = []
-    Rails.configuration.files['allowed_image_extensions'].each do |allowed_extension|
-      glob = File.join(folder, "*.#{allowed_extension}")
-      files += Dir.glob(glob)
-    end
-
-    return files
+    glob = File.join(folder, "*.#{self.image_filetype_glob}")
+    return Dir.glob(glob)
   end
 
   # Attempts to determine the mimetype of the given image based on extension
@@ -163,5 +148,45 @@ class FileSystem
 
     # Take the first split folder as the uploader
     return working_path.split(File::Separator)[0]
+  end
+
+  # Searches the included folders for folders that match the search term
+  # @param folder [string]  The search term for the folder to lookup
+  # @return [Array[string]] All folders that match the search term
+  def self.search_for_folder(folder)
+    self.search_for_item("**/*#{folder}*/")
+  end
+
+  # Searches the included folders for files that match the search term
+  # @param file [string]  The search term for the file to lookup
+  # @return [Array[string]] All files that match the search term
+  def self.search_for_file(file)
+    self.search_for_item("**/*#{file}*.#{self.audio_filetype_glob}")
+  end
+
+  # PRIVATE HELPERS ########################################################
+  private
+  def self.audio_filetype_glob
+    '{' + Rails.configuration.files['allowed_extensions'].join(',') + '}'
+  end
+
+  def self.image_filetype_glob
+    '{' + Rails.configuration.files['allowed_image_extensions'].join(',') + '}'
+  end
+
+  def self.search_for_item(search_term)
+    if search_term.nil? || search_term.length == 0
+      return []
+    end
+
+    # Process the search term into a fancypants glob
+    search_glob = search_term.gsub(' ', '{ ,-,_}')                 # Make space match space, dash, or underscore
+
+    # Get all the included folders to source from
+    match_items = []
+    self.get_all_folders.each do |source_folder|
+      match_items += Dir.glob(source_folder + search_glob, File::FNM_CASEFOLD)
+    end
+    return match_items
   end
 end
