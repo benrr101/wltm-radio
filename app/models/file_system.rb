@@ -54,6 +54,35 @@ class FileSystem
     return 'application/octet-stream'
   end
 
+  # Returns the minimum amount of path in order to get unique search terms
+  # @param [Array<String>] ambiguous_items The ambiguous items
+  # @return [Array<String>] The disambiguated items
+  def self.disambiguate_items(ambiguous_items)
+    # Turn the ambiguous list into a list of [dirname, basename]
+    # @type [Array<Array<String>>]
+    working_list = ambiguous_items.map {|e| [File.dirname(e), File.basename(e)]}
+
+    # Process until the working list is empty (ie, no dupes)
+    # @type [Array<String>]
+    output = []
+    until working_list.size == 0
+      dupes = []
+      working_list.group_by {|e| e[1]}.each do |k, v|
+        if v.size == 1
+          output.push(k)
+        else
+          v.each do |dupe|
+            # Shift the last element of the path into the disambiguated name
+            dupes.push([File.dirname(dupe[0]), File.join(File.basename(dupe[0]), dupe[1])])
+          end
+        end
+      end
+      working_list = dupes
+    end
+
+    return output
+  end
+
   # Retrieve statistics about free space
   # @return [FileSystem::Stats] Statistics about the space used on the base path
   def self.get_status

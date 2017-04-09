@@ -18,6 +18,25 @@ class Api::RequestController < ApplicationController
       return
     end
 
+
+    # Get the matches for the given search term
+    matches = FileSystem.search_for_file(params[:term])
+
+    # Ensure at least one match
+    if matches.length == 0
+      render :json => {:error => 'No matches found'}, status => :not_found
+      return
+    end
+
+    # Ensure only one match
+    if matches.length > 1
+      # Attempt to disambiguate the requests
+      disambiguated_matches = FileSystem.disambiguate_items(matches)
+      render :json => {:did_you_mean => disambiguated_matches}, status => 300   # Ambiguous Target
+      return
+    end
+
+
     render :json => FileSystem.search_for_file(params[:term])
   end
 
@@ -35,6 +54,23 @@ class Api::RequestController < ApplicationController
     if on_behalf_of.nil?
       render :json => {:error => 'on_behalf_of token not provided'},
              :status => :bad_request
+      return
+    end
+
+    # Get the matches for the given search term
+    matches = FileSystem.search_for_folder(params[:term])
+
+    # Ensure at least one match
+    if matches.length == 0
+      render :json => {:error => 'No matches found'}, status => :not_found
+      return
+    end
+
+    # Ensure only one match
+    if matches.length > 1
+      # Attempt to disambiguate the requests
+      disambiguated_matches = FileSystem.disambiguate_items(matches)
+      render :json => {:did_you_mean => disambiguated_matches}, status => 300   # Ambiguous Target
       return
     end
 
