@@ -45,7 +45,7 @@ class Api::RequestController < ApplicationController
     response = BufferRecord.add_request(track_id, params[:on_behalf_of])
 
     # Skip to the next track in the buffer
-    MpdController.skip
+    MpdController.skip if HistoryRecord.last.bot_queued?
 
     # Add the tracks to the buffer and return the status
     render :json => response,
