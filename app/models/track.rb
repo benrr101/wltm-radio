@@ -46,7 +46,9 @@ class Track < ApplicationRecord
           track_obj.title = tag_obj.tag.nil? ? 'Unknown Title' : tag_obj.tag.title
           track_obj.uploader = uploader
           track_obj.length = tag_obj.audio_properties.nil? ? 0 : tag_obj.audio_properties.length
-          track_obj.art_id = Art.create_from_file(file_path).id || nil
+
+          art = Art.create_from_file(file_path)
+          track_obj.art_id = art.nil? ? nil : art.id
         end
       end
     rescue => e
