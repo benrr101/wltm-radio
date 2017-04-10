@@ -42,7 +42,7 @@ class Api::RequestController < ApplicationController
 
     # Translate the match item to track IDs and add to the buffer
     track_ids = track_id_translator.call(matches[0])
-    response = BufferRecord.add_request(track_id, params[:on_behalf_of])
+    response = BufferRecord.add_request(track_ids, params[:on_behalf_of])
 
     # Skip to the next track in the buffer
     MpdController.skip if HistoryRecord.last.bot_queued?
