@@ -1,4 +1,5 @@
 require 'sys/filesystem'
+require 'taglib'
 
 class FileSystem
 
@@ -119,13 +120,29 @@ class FileSystem
     return Dir.glob(glob)
   end
 
-  # Fetches a list of all tracks that are in a given folder
+  # Fetches a list of all tracks that are in a given folder, ordered by track number or file name
+  # if any of the files are missing track numbers.
   # @param folder [string]  The absolute path of the folder to get all tracks from
   # @return [Array[string]] An arry of all files in the folder
   def self.get_all_folder_files(folder)
     # Generate files that are in the folder
     glob = File.join(folder, "*.#{self.audio_filetype_glob}")
-    return Dir.glob(glob)
+    files = Dir.glob(glob)
+
+    # Sort the files by track number or by filename
+    track_numbers = {}
+    return files.sort do |x, y|
+      x_track = track_numbers[x].nil? ? self.get_file_sort(x) : track_numbers[x]
+      y_track = track_numbers[y].nil? ? self.get_file_sort(y) : track_numbers[y]
+
+      # If either of the tracks don't have track numbers, use filenames instead
+      if x_track == '' || y_track == ''
+        next x <=> y
+      end
+
+      # Otherwise sort by track number
+      next x_track <=> y_track
+     end
   end
 
   # Fetches a list of all images in the folder of a given audio file
@@ -222,5 +239,26 @@ class FileSystem
       end
     end
     return match_items
+  end
+
+  # Using TagLib looks up the track number of the file.
+  # @param [String] path Absolute path to the file to read
+  # @return [Integer] The track number
+  def self.get_file_sort(path)
+    # Read the file with a fallback
+    track_number = 0
+    begin
+      TagLib::FileRef.open(path) do |tag_file|
+        track_number = tag_file.tag.track
+      end
+    rescue
+      track_number = 0
+    end
+
+    # Use empty string to indicate track number cannot come from tag file
+    return '' if track_number == 0
+
+    # Pad the track number with 0
+    track_number.to_s.rjust(2, '0')
   end
 end

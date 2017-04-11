@@ -28,7 +28,7 @@ class Track < ApplicationRecord
         when 'ogg', 'oga'
           reader_method = TagLib::Ogg::File.method(:open)
         when 'wav'
-          reader_method = TagLib::RIFF::WAV::file.method(:open)
+          reader_method = TagLib::RIFF::WAV::File.method(:open)
         when 'aiff', 'aif', 'aifc'
           reader_method = TagLib::RIFF::AIFF::File.method(:open)
         else

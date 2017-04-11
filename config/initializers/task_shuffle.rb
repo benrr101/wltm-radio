@@ -54,29 +54,7 @@ Rails.application.config.after_initialize do
         Rails.logger.debug("#{shuffle_pick} is too short, adding tracks before and after it")
 
         # Get all the tracks that are in the folder and sort by track number if possible
-        unshuffled_files = FileSystem::get_all_folder_files(File.dirname(shuffle_pick)).sort do |x,y|
-          # Get audio info for track x
-          x_track = 0
-          TagLib::FileRef.open(x) do |x_file|
-            x_track = x_file.tag.track
-          end
-
-          # Get audio info for track y
-          y_track = 0
-          TagLib::FileRef.open(y) do |y_file|
-            y_track = y_file.tag.track
-          end
-
-          # If either of the tracks don't have track numbers, use filenames instead
-          if x_track.nil? || y_track.nil?
-            next x <=> y
-          end
-
-          # TODO Add support for disc number comparison once taglib is working
-          # Sort by the track number
-          next x_track <=> y_track
-        end
-
+        unshuffled_files = FileSystem::get_all_folder_files(File.dirname(shuffle_pick))
 
         [0, 2].each do |i|
           bookend_file = unshuffled_files[unshuffled_files.index(shuffle_pick) + (i - 1)]
