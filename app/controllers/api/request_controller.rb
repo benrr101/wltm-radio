@@ -4,7 +4,7 @@ class Api::RequestController < ApplicationController
   # POST /request/file/:term
   #   Required header: Auth
   def file
-    id_translator = lambda {|path| Track.create_from_file(path).id}
+    id_translator = lambda {|path| [Track.create_from_file(path).id]}
     request_generic(FileSystem.method(:search_for_file), id_translator)
   end
 
@@ -27,7 +27,7 @@ class Api::RequestController < ApplicationController
 
     # Ensure at least one match
     if matches.length == 0
-      render :json => {:error => 'No matches found'}, status => :not_found
+      render :json => {:error => 'No matches found'}, :status => :not_found
       return
     end
 
