@@ -4,19 +4,19 @@ class Api::RequestController < ApplicationController
   # POST /request/file/:term
   #   Required header: Auth
   def file
-    id_translator = lambda {|path| [Track.create_from_file(path).id]}
-    request_generic(FileSystem.method(:search_for_file), id_translator)
+    track_resolver = lambda {|path| [path]}
+    request_generic(FileSystem.method(:search_for_file), track_resolver)
   end
 
   # POST /request/folder/:term
   #   Required header: Auth
   def folder
-    id_translator = lambda {|path| FileSystem.get_all_folder_files(path).map {|f| Track.create_from_file(f).id}}
-    request_generic(FileSystem.method(:search_for_folder), id_translator)
+    track_resolver = lambda {|path| FileSystem.get_all_folder_files(path)}
+    request_generic(FileSystem.method(:search_for_folder), track_resolver)
   end
 
   private
-  def request_generic(match_finder, track_id_translator)
+  def request_generic(match_finder, track_resolver)
     # Check for the auth headers
     # Require that a username token be provided
     return unless HmacKey.validate(request.headers, request.raw_post, &method(:render_error))
@@ -41,14 +41,22 @@ class Api::RequestController < ApplicationController
     end
 
     # Translate the match item to track IDs and add to the buffer
-    track_ids = track_id_translator.call(matches[0])
-    response = BufferRecord.add_request(track_ids, params[:on_behalf_of])
+    tracks = track_resolver.call(matches[0]).map {|path| Track.create_from_file(path)}
+    response = BufferRecord.add_request(tracks, params[:on_behalf_of])
 
     # Skip to the next track in the buffer
-    MpdController.skip if HistoryRecord.last.bot_queued?
+    remaining_seconds = response[:seconds_remaining]
+    if HistoryRecord.last.bot_queued?
+      MpdController.skip
+    else
+      remaining_seconds += Mpd.new.remaining_time || 0
+    end
 
     # Add the tracks to the buffer and return the status
-    render :json => response,
-           :status => :ok
+    render :json => {
+        :seconds_remaining => remaining_seconds,
+        :tracks => tracks.map {|t| t.serializable_hash(Track.serializable_hash_options)},
+        :tracks_enqueued => response[:tracks_enqueued]
+    }, :status => :ok
   end
 end

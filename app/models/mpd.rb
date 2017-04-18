@@ -119,9 +119,8 @@ require 'ruby-mpd'
 
     # Presses the "next" button on MPD
     def next
-      # fire up the connection
-      @mpd_connection.connect
       begin
+        @mpd_connection.connect
         # Next!
         @mpd_connection.next
       ensure
@@ -133,9 +132,9 @@ require 'ruby-mpd'
     # Adds a track to the play queue based on its absolute path
     # @param [string] abs_path  Absolute path to the track to add to the queue
     def queue_add(abs_path)
-      # fire up the connection
-      @mpd_connection.connect
       begin
+        @mpd_connection.connect
+
         # Add a new track to the queue
         @mpd_connection.add(abs_path)
 
@@ -147,46 +146,53 @@ require 'ruby-mpd'
       end
     end
 
-    # @return [int]   The number of tracks currently in the play queue
+    # @return [Integer]   The number of tracks currently in the play queue
     def queue_length
-      # fire up the connection
-      @mpd_connection.connect
       begin
+        @mpd_connection.connect
         return @mpd_connection.queue.count
+      rescue
+          return 0
       ensure
         # Make sure we always disconnect
         @mpd_connection.disconnect
       end
     end
 
-    # @return [int?]  The number of seconds remaining for the currently playing track
+    # @return [Integer|nil]  The number of seconds remaining for the currently playing track
     #                 Nil is returned if the nothing is playing currently
     def remaining_time
-      # fire up the connection
-      @mpd_connection.connect
       begin
+        # fire up the connection
+        @mpd_connection.connect
+
         # If we're not playing, return nil
-        unless @mpd_connection.playing?
-          return nil
-        end
+        return nil unless @mpd_connection.playing?
 
         # We are playing, so return the number of seconds that are left
         return Mpd.get_time(@mpd_connection).seconds_remaining
+      rescue
+          return nil
       ensure
         @mpd_connection.disconnect
       end
     end
 
     # Ensures that consume mode is turned on for MPD
-    # @return [bool]  True if successfully set to true, false otherwise
+    # @return [Boolean|nil]  True if consume mode was set to true,
+    #                        False if consume mode could not be set to true
+    #                        nil if an exception occurred
     def ensure_consume
-      # fire up the connection
-      @mpd_connection.connect
       begin
-        # force consume mode on
-        return @mpd_connection.consume = true
+          # fire up the connection
+          @mpd_connection.connect
+
+          # force consume mode on
+          return @mpd_connection.consume = true
+      rescue
+          return nil
       ensure
-        @mpd_connection.disconnect
+          @mpd_connection.disconnect
       end
     end
 

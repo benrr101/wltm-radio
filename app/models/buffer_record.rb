@@ -3,7 +3,7 @@ class BufferRecord < ApplicationRecord
 
   # Adds all tracks in the list to the buffer on behalf of the requestor. Performs all the logic
   # for removing bot queued entries and inserts after unique requests
-  # @param [Array<Integer>] folder_items List of track IDs to add to the buffer
+  # @param [Array<Track>] folder_items List of tracks to add to the buffer
   # @param [String] on_behalf_of The user that requested the tracks
   # @return [Integer] Number of seconds before requested tracks will be played
   def self.add_request(folder_items, on_behalf_of)
@@ -44,8 +44,8 @@ class BufferRecord < ApplicationRecord
     folder_items.each do |item|
       BufferRecord.create(on_behalf_of: on_behalf_of,
                           bot_queued: false,
-                          track_id: item)
-      Rails.logger.info("Added track #{item} on behalf of #{on_behalf_of}")
+                          track_id: item.id)
+      Rails.logger.info("Added track #{item.artist} - #{item.title} on behalf of #{on_behalf_of}")
     end
 
     # All the records that need to be added again will be created at the end of the queue and
