@@ -11,6 +11,14 @@ class Track < ApplicationRecord
   has_many :history_record, dependent: :destroy
   has_many :buffer_record, dependent: :destroy
 
+  def Track.serializable_hash_options
+    {
+        :include => { :art => Art.serializable_hash_options },
+        :methods => [:download_link, :folder_download_link],
+        :except => [:created_at, :updated_at, :absolute_path]
+    }
+  end
+
   def Track.create_from_file(file_path)
     unless File.exists?(file_path)
       Rails.logger.warn("Failed to create track record: File does not exist #{file_path}")

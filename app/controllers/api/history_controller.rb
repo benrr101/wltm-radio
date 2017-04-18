@@ -1,27 +1,14 @@
 class Api::HistoryController < ApplicationController
   # GET /history/current
   def current
-    current_track = HistoryRecord.order(:played_time).last.serializable_hash(
-        :include => {
-            :track => {
-              :include => {
-                  :art => {
-                    :except => [:created_at, :updated_at, :hash_code, :id, :bytes],
-                    :methods => [:art_link]
-                  }
-              },
-              :except => [:created_at, :updated_at, :absolute_path, :art_id],
-              :methods => [:download_link, :folder_download_link]
-            }
-        },
-        :except => [:track_id, :created_at, :updated_at]
-    )
+    current_track = HistoryRecord.order(:played_time).last
 
+    # Only include the time stats if there's a track playing
     mpd_stats = Mpd.new.get_status
     time_stats = mpd_stats.current_track.nil? ? nil : mpd_stats.current_track.time_stats
 
     render :json => {
-        :current_track => current_track,
+        :current_track => current_track.serializable_hash(HistoryRecord.serializable_hash_options),
         :time_stats =>  time_stats
     }
   end
@@ -67,13 +54,9 @@ class Api::HistoryController < ApplicationController
     # Add pagination if it was requested, otherwise we'll assume the default
     page_size = params[:pagesize].nil? ? 100 : params[:pagesize].to_i
     page = params[:page].nil? ? 0 : params[:page].to_i
-    tracks = tracks.offset(page_size * page).limit(page_size)
+    tracks = tracks.offset(page_size * page).limit(page_size).all
 
-    render :json => tracks,
-           :include => {:track => {
-               :except => [:created_at, :updated_at, :absolute_path],
-               :methods => [:download_link, :folder_download_link]
-           }},
-           :except => [:created_at, :updated_at, :track_id]
+    serializable_hash_options = HistoryRecord.serializable_hash_options
+    render :json => tracks.map {|item| item.serializable_hash(serializable_hash_options)}
   end
 end

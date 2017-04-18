@@ -9,6 +9,13 @@ require 'taglib/wav'
 class Art < ApplicationRecord
   has_many :track
 
+  def self.serializable_hash_options
+    {
+        :methods => [:art_link],
+        :except => [:created_at, :updated_at, :hash_code, :id, :bytes],
+    }
+  end
+
   def self.create_from_file(path)
     unless File.exists?(path)
       Rails.logger.warn("Failed to create art record: File does not exist #{path}")
