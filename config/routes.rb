@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   get 'index', to: 'index#index'
   get 'history', to: 'index#history'
 
-  namespace :api, constraints: {format: 'json'}, defaults: {format: 'json'} do
+  namespace :api, constraints: {format: 'json'}, defaults: {format: false} do
     # STATS CONTROLLER #####################################################
 
     # GET /stats/share
@@ -30,10 +30,10 @@ Rails.application.routes.draw do
     # REQUEST CONTROLLER ###################################################
 
     # POST /request/folder
-    post 'request/folder/:term', to: 'request#folder'
+    post 'request/folder/:term', to: 'request#folder', constraints: {:term => /[^\/]+/}
 
     # POST /request/file
-    post 'request/file/:term', to: 'request#file'
+    post 'request/file/:term', to: 'request#file', constraints: {:term => /[^\/]+/}
 
     # SKIP CONTROLLER ######################################################
 

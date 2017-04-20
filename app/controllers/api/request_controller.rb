@@ -46,6 +46,7 @@ class Api::RequestController < ApplicationController
       short_path = File.basename(matches[0])
       render :json => {:error => "Match #{short_path} did not contain any audio files"},
              :status => 204   # No content
+      return
     end
 
     response = BufferRecord.add_request(tracks, params[:on_behalf_of])

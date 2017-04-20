@@ -207,7 +207,13 @@ class FileSystem
   # @param file [string]  The search term for the file to lookup
   # @return [Array[string]] All files that match the search term
   def self.search_for_file(file)
-    self.search_for_item("**/*#{file}*.#{self.audio_filetype_glob}")
+    if Rails.configuration.files['allowed_extensions'].any? {|ext| file.ends_with?('.' + ext)}
+      # The search term included an audio extension, omit it from the globbing
+      return self.search_for_item("**/*#{file}*")
+    else
+      # Search term did not include an audio extension, so add them to the globbing
+      return self.search_for_item("**/*#{file}*.#{self.audio_filetype_glob}")
+    end
   end
 
   # PRIVATE HELPERS ########################################################
