@@ -42,15 +42,16 @@ class Api::RequestController < ApplicationController
 
     # Translate the match item to track IDs and add to the buffer
     tracks = track_resolver.call(matches[0]).map {|path| Track.create_from_file(path)}
+    if tracks.size == 0
+      short_path = File.basename(matches[0])
+      render :json => {:error => "Match #{short_path} did not contain any audio files"},
+             :status => 204   # No content
+    end
+
     response = BufferRecord.add_request(tracks, params[:on_behalf_of])
 
-    # Skip to the next track in the buffer
-    remaining_seconds = response[:seconds_remaining]
-    if HistoryRecord.last.bot_queued?
-      MpdController.skip
-    else
-      remaining_seconds += Mpd.new.remaining_time || 0
-    end
+    # Figure out how many seconds are remaining
+    remaining_seconds = response[:seconds_remaining] + (Mpd.new.remaining_time || 0)
 
     # Add the tracks to the buffer and return the status
     render :json => {

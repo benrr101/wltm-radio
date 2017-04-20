@@ -200,14 +200,14 @@ class FileSystem
   # @param folder [string]  The search term for the folder to lookup
   # @return [Array[string]] All folders that match the search term
   def self.search_for_folder(folder)
-    self.search_for_item("**/*#{folder}*/", true)
+    self.search_for_item("**/*#{folder}*/")
   end
 
   # Searches the included folders for files that match the search term
   # @param file [string]  The search term for the file to lookup
   # @return [Array[string]] All files that match the search term
   def self.search_for_file(file)
-    self.search_for_item("**/*#{file}*.#{self.audio_filetype_glob}", false)
+    self.search_for_item("**/*#{file}*.#{self.audio_filetype_glob}")
   end
 
   # PRIVATE HELPERS ########################################################
@@ -220,23 +220,21 @@ class FileSystem
     '{' + Rails.configuration.files['allowed_image_extensions'].join(',') + '}'
   end
 
-  def self.search_for_item(search_term, leaves_only)
+  def self.search_for_item(search_term)
     if search_term.nil? || search_term.length == 0
       return []
     end
 
     # Process the search term into a fancypants glob
-    search_glob = search_term.gsub(' ', '{ ,-,_}')                 # Make space match space, dash, or underscore
+    search_glob = search_term.gsub(' ', '*')                 # Make space match space, dash, or underscore
 
     # Get all the included folders to source from
     match_items = []
     self.get_all_folders.each do |source_folder|
       glob_matches = Dir.glob(File.join(source_folder, search_glob), File::FNM_CASEFOLD)
-      if leaves_only
-        match_items += glob_matches.select {|m| Pathname.new(m).children.count {|p| p.directory?} == 0}
-      else
-        match_items += glob_matches
-      end
+
+      # Add all the matches to the list of matches
+      match_items += glob_matches
     end
     return match_items
   end
