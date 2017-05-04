@@ -81,6 +81,10 @@ class Track < ApplicationRecord
     URI.join(Rails.configuration.files['base_download_path'], working_path).to_s
   end
 
+  def exists_on_disk?
+    File.exists?(self.absolute_path)
+  end
+
   def folder_download_link
     # Skip generating a folder download link if we don't have a base path
     if Rails.configuration.files['base_folder_download_path'].nil?

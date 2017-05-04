@@ -35,6 +35,9 @@ Rails.application.routes.draw do
     # POST /request/file
     post 'request/file/:term', to: 'request#file', constraints: {:term => /[^\/]+/}
 
+    # POST /request/id
+    post 'request/id/:id', to: 'request#id'
+
     # SKIP CONTROLLER ######################################################
 
     # POST /skip

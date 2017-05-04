@@ -15,6 +15,38 @@ class Api::RequestController < ApplicationController
     request_generic(FileSystem.method(:search_for_folder), track_resolver)
   end
 
+  # POST /request/id/:id
+  #  Required header: Auth
+  def id
+    # Check for the auth headers
+    # Require that a username token be provided
+    return unless HmacKey.validate(request.headers, request.raw_post, &method(:render_error))
+    return unless param_check(params, :on_behalf_of, &method(:render_error))
+
+    # Get the track that was requested
+    track = Track.find_by_id(params[:id])
+    if track.nil?
+      render :json => {:error => "Track with id [#{params[:id]}] does not exist"}, :status => 404
+      return
+    end
+    unless track.exists_on_disk?
+      render :json => {:error => "Track with id [#{params[:id]} no longer exists"}, :status => 404
+      return
+    end
+
+    # Enqueue the track
+    response = BufferRecord.add_request([track], params[:on_behalf_of])
+
+    # Figure out how many seconds are remaining
+    remaining_seconds = response[:seconds_remaining] + (Mpd.new.remaining_time || 0)
+
+    render :json => {
+        :seconds_remaining => remaining_seconds,
+        :tracks => [track.serializable_hash(Track.serializable_hash_options)],
+        :tracks_enqueued => response[:tracks_enqueued]
+    }, :status => :ok
+  end
+
   private
   def request_generic(match_finder, track_resolver)
     # Check for the auth headers
