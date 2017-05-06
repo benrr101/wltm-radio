@@ -7,7 +7,7 @@ class FileSystem
   class Status
 
     # Initializes a Status class by calculating the
-    # @param [Sys::Filesystem::Stat] stat Statistics object from sys/filesystem
+    # @param <Sys::Filesystem::Stat> stat Statistics object from sys/filesystem
     def initialize(stat)
       @total_gb = stat.blocks * stat.block_size / 1024 / 1024 / 1024
       @free_gb = stat.blocks_free * stat.block_size / 1024 / 1024 / 1024
@@ -18,35 +18,32 @@ class FileSystem
       @free_percent = 100 - @inuse_percent
     end
 
-    # @return [int] Total number of GB for the base path
+    # @return <Integer> Total number of GB for the base path
     def total_gb
       @total_gb
     end
 
-    # @return [int] Number of GB free for the base path
+    # @return <Integer> Number of GB free for the base path
     def free_gb
       @free_gb
     end
 
-    # @return [int] Number of GB in use for the base path
+    # @return <Integer> Number of GB in use for the base path
     def inuse_gb
       @inuse_gb
     end
 
-    # @return [float] Percentage of base path in use
+    # @return <Float> Percentage of base path in use
     def inuse_percent
       @inuse_percent
     end
 
-    # @return [float] Percentage of base path free
+    # @return <Float> Percentage of base path free
     def free_percent
       @free_percent
     end
 
   end
-
-  # CLASS VARIABLES ########################################################
-  @@base_folder_selection = 0
 
   # CLASS METHODS ##########################################################
 
@@ -109,11 +106,13 @@ class FileSystem
   # Determines what files should be included in the shuffle
   # @return [Array[string]] An array of strings that should be shuffled
   def self.get_all_shuffle_files
+    # Get te
+
     # Select the base folder for this selection
     base_folders = self.get_all_folders
-    selected_base_folder = base_folders[@@base_folder_selection]
-    @@base_folder_selection = (@@base_folder_selection + 1) % base_folders.length
-    Rails.logger.debug("Picking file from selected base folder #{@@base_folder_selection} #{selected_base_folder}")
+    base_folder_selection = PersistentSettings.preincrement_with_wrap(PersistentSettings::RoundRobinIdKey, base_folders.length)
+    selected_base_folder = base_folders[base_folder_selection]
+    Rails.logger.debug("Picking file from selected base folder #{base_folder_selection} #{selected_base_folder}")
 
     # Generate globs for the different filetypes
     glob = File.join(selected_base_folder, "**/*.#{self.audio_filetype_glob}")
@@ -204,8 +203,8 @@ class FileSystem
   end
 
   # Searches the included folders for files that match the search term
-  # @param file [string]  The search term for the file to lookup
-  # @return [Array[string]] All files that match the search term
+  # @param file [String]  The search term for the file to lookup
+  # @return [Array<String>] All files that match the search term
   def self.search_for_file(file)
     if Rails.configuration.files['allowed_extensions'].any? {|ext| file.ends_with?('.' + ext)}
       # The search term included an audio extension, omit it from the globbing

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170326231900) do
+ActiveRecord::Schema.define(version: 20170505175400) do
 
   create_table "arts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string   "hash_code",  limit: 64,       null: false
@@ -46,6 +46,12 @@ ActiveRecord::Schema.define(version: 20170326231900) do
     t.string "description"
     t.index ["private_key"], name: "index_hmac_keys_on_private_key", unique: true, using: :btree
     t.index ["public_key"], name: "index_hmac_keys_on_public_key", unique: true, using: :btree
+  end
+
+  create_table "persistent_settings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.string "key",   null: false
+    t.string "value", null: false
+    t.index ["key"], name: "index_persistent_settings_on_key", unique: true, using: :btree
   end
 
   create_table "skips", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
