@@ -6,7 +6,7 @@ class PersistentSettings < ApplicationRecord
   def self.preincrement_with_wrap(key, wrap)
     # Find the specified setting
     setting = self.find_by_key(key)
-    return nil unless setting.any?
+    return nil if setting.nil?
 
     # Store off the old value
     old_value = setting.value.to_i
