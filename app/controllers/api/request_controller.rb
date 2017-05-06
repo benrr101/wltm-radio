@@ -26,11 +26,12 @@ class Api::RequestController < ApplicationController
     # Get the track that was requested
     track = Track.find_by_id(params[:id])
     if track.nil?
-      render :json => {:error => "Track with id [#{params[:id]}] does not exist"}, :status => 404
+      render :json => {:error => "Track with id [#{params[:id]}] does not exist"}, :status => :not_found
       return
     end
     unless track.exists_on_disk?
-      render :json => {:error => "Track with id [#{params[:id]} no longer exists"}, :status => 404
+      track.destroy
+      render :json => {:error => "Track with id [#{params[:id]} no longer exists"}, :status => :gone
       return
     end
 
